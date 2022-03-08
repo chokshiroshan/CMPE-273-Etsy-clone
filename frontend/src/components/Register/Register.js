@@ -15,7 +15,7 @@ export default function Register() {
       <input type="password" id="inputConfirmPassword" class="form-control" placeholder="Confirm Password" required=""/>
 
       
-      <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+      <a class="btn btn-lg btn-block default-button mt-2" type="submit">Register</a>
       
     </form>
     </>

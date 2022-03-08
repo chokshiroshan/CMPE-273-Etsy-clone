@@ -1,0 +1,26 @@
+a.default-button{
+    background: #F1641D;
+    border-radius: 20px;
+    font-size: inherit;
+    color: #fff !important;
+    box-shadow: none;
+    border: none;
+    text-shadow: none;
+    padding: 8px 20px;
+    transition: background-color 0.25s;
+}
+
+a.default-button:focus,a.default-button:hover{
+    background: #99522e;
+}
+
+#create-shop-search{
+    width: 400px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.shop-content{
+    text-align: center;
+    margin-top: 250px;
+}

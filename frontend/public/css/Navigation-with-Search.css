@@ -68,7 +68,7 @@
 }
 
 .navigation-clean-search .action-button, .navigation-clean-button .action-button:active {
-  background: #56c6c6;
+  background: #F1641D;
   border-radius: 20px;
   font-size: inherit;
   color: #fff !important;
@@ -80,12 +80,13 @@
 }
 
 .navigation-clean-search .action-button:hover, .navigation-clean-search .action-button:focus {
-  background: #66d7d7;
+  background: #99522e;
 }
 
 .navigation-clean-search .search-form label {
   color: #ccc;
 }
+
 
 .navigation-clean-search .search-form .search-field {
   background: none;
@@ -96,7 +97,7 @@
   box-shadow: none;
   color: inherit;
   transition: border-bottom-color 0.3s;
-  width: 1050px;
+  width: 58rem;
 }
 
 @media (max-width:767px) {

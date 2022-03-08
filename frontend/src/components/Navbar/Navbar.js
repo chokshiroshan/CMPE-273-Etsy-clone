@@ -14,7 +14,12 @@ export default function Navbar(props) {
                 <ul className="navbar-nav"></ul>
                 <form className="me-auto search-form" target="_self">
                     <div className="d-flex align-items-center"><label className="form-label d-flex mb-0" htmlFor="search-field"><i className="fa fa-search"></i></label><input className="form-control search-field" type="search" id="search-field" name="search" /></div>
-                </form>{signButton}<a className="btn btn-light action-button" role="button" href="#">Cart</a>
+                </form>
+                <Link className="btn btn-light action-button" role="button" to="/profile">Favourites</Link>
+                {signButton}
+                <Link className="btn btn-light action-button" role="button" to="/cart">Cart</Link>
+                
+                
             </div>
         </div>
     </nav>
