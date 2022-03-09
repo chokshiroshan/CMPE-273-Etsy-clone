@@ -8,8 +8,9 @@ import ProductPage from './ProductPage/ProductPage';
 import Profile from './Profile/Profile';
 import Cart from './Cart/Cart';
 import Purchased from './Cart/Purchased';
-import CreateShop from './Shop/CheckShop';
 import CheckShop from './Shop/CheckShop';
+import Shop from './Shop/Shop';
+import Search from './Home/Search';
 
 //Create a Main Component
 class Main extends Component {
@@ -20,6 +21,7 @@ class Main extends Component {
                 <Routes>
                 {/*Render Different Component based on Route*/}
                 <Route path="/" element={<Home/>}/>
+                <Route path="/search" element={<Search/>}/>
                 <Route path="/signin" element={<SignIn/>}/>
                 <Route path="/register" element={<Register/>}/>
                 <Route path="/update" element={<Update/>}/>
@@ -28,7 +30,7 @@ class Main extends Component {
                 <Route path="/cart" element={<Cart/>}/>
                 <Route path="/purchased" element={<Purchased/>}/>
                 <Route path="/checkshop" element={<CheckShop/>}/>
-
+                <Route path="/shop" element={<Shop/>}/>
                 </Routes>
             </div>
             

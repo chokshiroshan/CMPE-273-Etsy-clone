@@ -108,6 +108,9 @@
 }
 
 .navigation-clean-search .search-form .search-field:focus {
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid #f16f2e;
 }
 
+.fa-search{
+  color: #f16f2e;
+}
