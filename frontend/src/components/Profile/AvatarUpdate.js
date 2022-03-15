@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
+import Cookies from "js-cookie";
+const axios = require("axios");
 
 export default function AvatarUpdate() {
   return (
@@ -8,7 +10,7 @@ export default function AvatarUpdate() {
           <div className="avatar">
             <div className="avatar-bg center"></div>
           </div>
-          <input className="form-control" type="file" name="avatar-file" />
+          <input className="form-control" type="file" name="image" />
         </div>
       </div>
     </>
