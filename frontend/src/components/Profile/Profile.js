@@ -8,6 +8,7 @@ const axios = require("axios");
 
 export default function Profile() {
   const [userData, setUserData] = useState("");
+
   let shop;
   // useEffect(() => {
   //   axios
