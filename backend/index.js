@@ -51,7 +51,7 @@ app.post("/login", function (request, response) {
           });
           // Redirect to home page
           console.log("Correct");
-          response.end("Correct Username and/or Password!");
+          response.end("SUCCESS");
         } else {
           console.log("Incorrect");
 
@@ -75,24 +75,29 @@ app.post("/register", function (request, response) {
   if (username && password) {
     // Execute SQL query that'll select the account from the database based on the specified username and password
     db.query(
-      "SELECT * FROM users WHERE username = ? AND password = ?",
+      "INSERT INTO `users`(`username`, `password`) VALUES (?,?)",
       [username, password],
       function (error, results, fields) {
         // If there is an issue with the query, output the error
-        if (error) throw error;
+
+        console.log(results);
         // If the account exists
-        if (results.length > 0) {
+        if (error) {
+          if (error.errno == 1062) {
+            console.log("User not Created");
+
+            response.end("UNSUCCESS");
+          }
+        }
+
+        if (results) {
           // Authenticate the user
           response.writeHead(200, {
             "Content-Type": "text/plain",
           });
           // Redirect to home page
-          console.log("Correct");
-          response.end("Correct Username and/or Password!");
-        } else {
-          console.log("Incorrect");
-
-          response.end("UNSUCCESS");
+          console.log("User Created");
+          response.end("SUCCESS");
         }
         response.end();
       }
@@ -101,6 +106,22 @@ app.post("/register", function (request, response) {
     response.send("Please enter Username and Password!");
     response.end();
   }
+});
+
+app.get("/getuserdata", function (request, response) {
+  let user = request.query.user;
+  console.log(user);
+  db.query(
+    "SELECT * FROM `users` WHERE `username` = ?",
+    [user],
+    function (err, rows, fields) {
+      if (err) {
+        throw err;
+      } else {
+        response.json(rows);
+      }
+    }
+  );
 });
 
 app.listen("3001", () => {});

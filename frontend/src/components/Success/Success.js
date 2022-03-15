@@ -1,11 +1,11 @@
 import React from "react";
 
-const Error = (props) => {
+const Success = (props) => {
   return (
-    <div className="alert alert-danger">
+    <div className="alert alert-success">
       <strong>{props.message}</strong>
     </div>
   );
 };
 
-export default Error;
+export default Success;

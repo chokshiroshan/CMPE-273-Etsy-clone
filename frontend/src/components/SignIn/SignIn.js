@@ -22,7 +22,7 @@ export default function SignIn() {
     axios.defaults.withCredentials = true;
     //make a post request with the user data
     axios.post("http://127.0.0.1:3001/login", data).then((response) => {
-      if (response.status === 200) {
+      if (response.data === "SUCCESS") {
         setAuth(true);
         console.log("Status Code : ", response.status);
         Cookies.set("username", username, { expires: 1 });

@@ -2,10 +2,12 @@ import React from "react";
 import Navbar from "../Navbar/Navbar";
 import ProductList from "../Home/ProductList";
 import { Link } from "react-router-dom";
+import Redirect from "../Redirect/Redirect";
 
 export default function Favourites() {
   return (
     <>
+      <Redirect />
       <Navbar loggedin={false} />
       <div className="container">
         <div className="row mt-3">
