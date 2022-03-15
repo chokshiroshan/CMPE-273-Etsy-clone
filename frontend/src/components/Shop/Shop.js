@@ -2,11 +2,11 @@ import React from "react";
 import { useState } from "react";
 import Navbar from "../Navbar/Navbar";
 import Form from "./Form";
+import Redirect from "../Redirect/Redirect";
 
 export default function Shop() {
   const [add, setAdd] = useState(false);
   const [edit, setEdit] = useState(false);
-
 
   const toggleAdd = () => {
     setAdd(!add);
@@ -16,6 +16,7 @@ export default function Shop() {
   };
   return (
     <>
+      <Redirect />
       <Navbar />
       <div className="container">
         <div className="row" style={{ borderBottom: "1px solid" }}>
@@ -81,7 +82,11 @@ export default function Shop() {
                   justo odio, dapibus ac facilisis in, egestas eget quam. Donec
                   id elit non mi porta gravida at eget metus.
                 </p>
-                <a className="btn btn-primary default-button" type="button" onClick={toggleEdit}>
+                <a
+                  className="btn btn-primary default-button"
+                  type="button"
+                  onClick={toggleEdit}
+                >
                   Edit
                 </a>
                 <a className="btn btn-primary default-button" type="button">
@@ -90,7 +95,10 @@ export default function Shop() {
               </div>
             </div>
           </div>
-          <div className="col-md-3 offset-6" style={{borderLeft:"1px solid"}}>
+          <div
+            className="col-md-3 offset-6"
+            style={{ borderLeft: "1px solid" }}
+          >
             <h3>Sales Details</h3>
           </div>
         </div>
