@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../Navbar/Navbar";
-import CountrySelect from "./CountrySelect";
 import Cookies from "js-cookie";
 import { Navigate } from "react-router";
 
@@ -17,6 +16,17 @@ export default function Update() {
   const [city, setCity] = useState("");
   const [country, setCountry] = useState("");
   const [submit, setSubmit] = useState(false);
+  const [userData, setUserData] = useState("");
+
+  useEffect(() => {
+    async function getUserData() {
+      const response = await axios.get("http://localhost:3001/getuserdata", {
+        params: { user: Cookies.get("username") },
+      });
+      setUserData(response.data[0]);
+    }
+    getUserData();
+  }, []);
 
   const username = Cookies.get("username");
 
@@ -24,10 +34,6 @@ export default function Update() {
     setFile(event.target.files[0]);
     console.log(file);
   };
-
-  // const uploadHandler = () => {
-  //   axios.post("http://localhost:3001/upload", file);
-  // };
 
   const update = () => {
     const data = {
@@ -54,6 +60,25 @@ export default function Update() {
       }
     });
   };
+
+  const fillWithData = () => {
+    setName(userData.name);
+    setPhone(userData.phone);
+    setGender(userData.gender);
+    setEmail(userData.email);
+    setBirthday(userData.birthday.slice(0, 10));
+    setAddress(userData.address);
+    setCity(userData.city);
+    setCountry(userData.country);
+  };
+
+  // const timeout = () => {
+  //   setTimeout(() => {
+  //     console.log("time");
+
+  //   }, 10);
+  // };
+
   return (
     <>
       {submit ? <Navigate to="/profile" /> : ""}
@@ -83,6 +108,7 @@ export default function Update() {
                   <input
                     className="form-control"
                     type="text"
+                    value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
                 </div>
@@ -93,6 +119,7 @@ export default function Update() {
                   <input
                     className="form-control"
                     type="text"
+                    value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
@@ -103,6 +130,7 @@ export default function Update() {
                   <input
                     className="form-control"
                     type="number"
+                    value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                   />
                 </div>
@@ -155,6 +183,7 @@ export default function Update() {
                   <input
                     className="form-control"
                     type="date"
+                    value={birthday}
                     onChange={(e) => setBirthday(e.target.value)}
                   />
                 </div>
@@ -164,6 +193,7 @@ export default function Update() {
                   <label className="form-label ">Address</label>
                   <textarea
                     className="form-control"
+                    value={address}
                     onChange={(e) => setAddress(e.target.value)}
                   ></textarea>
                 </div>
@@ -174,6 +204,7 @@ export default function Update() {
                   <input
                     className="form-control"
                     type="text"
+                    value={city}
                     onChange={(e) => setCity(e.target.value)}
                   />
                 </div>
@@ -184,6 +215,7 @@ export default function Update() {
                   <select
                     className="form-select"
                     defaultValue={"DEFAULT"}
+                    value={country}
                     onChange={(e) => setCountry(e.target.value)}
                   >
                     <option value="DEFAULT" disabled>
@@ -517,6 +549,18 @@ export default function Update() {
                     onClick={update}
                   >
                     Update
+                  </a>
+                </div>
+              </div>
+              <div className="row profile-row justify-content-center mt-2">
+                <div className="col-md-4">
+                  <a
+                    className="btn btn-light action-button default-button"
+                    role="button"
+                    href="#"
+                    onClick={fillWithData}
+                  >
+                    Fill Old Data
                   </a>
                 </div>
               </div>

@@ -1,19 +1,103 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../Navbar/Navbar";
 import Form from "./Form";
 import Redirect from "../Redirect/Redirect";
+import axios from "axios";
+import Cookies from "js-cookie";
 
 export default function Shop() {
   const [add, setAdd] = useState(false);
   const [edit, setEdit] = useState(false);
+  const [userData, setUserData] = useState("");
+  const [addImage, setAddImage] = useState("");
+  const [addName, setAddName] = useState("");
+  const [addCategory, setAddCategory] = useState("");
+  const [addDescription, setAddDescription] = useState("");
+  const [addPrice, setAddPrice] = useState("");
+  const [addQuantity, setAddQuantity] = useState("");
 
+  const [editImage, setEditImage] = useState("");
+  const [editName, setEditName] = useState("");
+  const [editCategory, setEditCategory] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  const [editPrice, setEditPrice] = useState("");
+  const [editQuantity, setEditQuantity] = useState("");
+  useEffect(() => {
+    async function getUserData() {
+      const response = await axios.get("http://localhost:3001/getuserdata", {
+        params: { user: Cookies.get("username") },
+      });
+      setUserData(response.data[0]);
+    }
+    getUserData();
+  }, []);
+
+  const shop = userData.shop;
   const toggleAdd = () => {
     setAdd(!add);
   };
+
   const toggleEdit = () => {
     setEdit(!edit);
   };
+
+  const additem = () => {
+    const data = {
+      shop: shop,
+      name: addName,
+      category: addCategory,
+      description: addDescription,
+      price: addPrice,
+      quantity: addQuantity,
+    };
+    //set the with credentials to true
+    axios.defaults.withCredentials = true;
+    //make a post request with the user data
+    axios.post("http://127.0.0.1:3001/additem", data).then((response) => {
+      if (response.data === "SUCCESS") {
+        console.log("Status Code : ", response.status);
+        setAdd(false);
+        setAddName("");
+        setAddCategory("");
+        setAddDescription("");
+        setAddPrice("");
+        setAddQuantity("");
+      }
+      if (response.data === "UNSUCCESS") {
+        console.log(response.data);
+      }
+    });
+  };
+
+  const edititem = () => {
+    const data = {
+      shop: shop,
+      name: editName,
+      category: editCategory,
+      description: editDescription,
+      price: editPrice,
+      quantity: editQuantity,
+    };
+    //set the with credentials to true
+    axios.defaults.withCredentials = true;
+    //make a post request with the user data
+    axios.post("http://127.0.0.1:3001/edititem", data).then((response) => {
+      if (response.data === "SUCCESS") {
+        console.log("Status Code : ", response.status);
+        setEdit(false);
+        setEditName("");
+        setEditCategory("");
+        setEditDescription("");
+        setEditPrice("");
+        setEditQuantity("");
+      }
+      if (response.data === "UNSUCCESS") {
+        console.log(response.data);
+      }
+    });
+  };
+
   return (
     <>
       <Redirect />
@@ -24,7 +108,7 @@ export default function Shop() {
             <img />
           </div>
           <div className="col col-md-3">
-            <h1>Store Name</h1>
+            <h1>{userData.shop}</h1>
             <a
               className="btn btn-light default-button"
               role="button"
@@ -34,9 +118,10 @@ export default function Shop() {
             </a>
           </div>
           <div className="col col-md-2 offset-5">
-            <p>Store Owner</p>
-            <p>Owner Name</p>
-            <p>Owner Contact</p>
+            <h4>Store Owner Details</h4>
+            <p>Owner Name: {userData.name}</p>
+            <p>Owner Email: {userData.email}</p>
+            <p>Owner Phone: {userData.phone}</p>
           </div>
         </div>
         {add && (
@@ -53,11 +138,85 @@ export default function Shop() {
                   </a>
                 </div>
               </div>
-              <Form />
+              <div className="row profile-row justify-content-center">
+                <div className="col-md-8">
+                  <label className="form-label">Item Image</label>
+                  <div className="avatar">
+                    <div className="avatar-bg center"></div>
+                  </div>
+                  <input
+                    className="form-control"
+                    type="file"
+                    name="avatar-file"
+                    value={addImage}
+                    onChange={(e) => setAddImage(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="row profile-row justify-content-center mt-2">
+                <div className="col-md-8">
+                  <label className="form-label">Item Name</label>
+                  <input
+                    className="form-control"
+                    type="text"
+                    value={addName}
+                    onChange={(e) => setAddName(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="row profile-row justify-content-center mt-2">
+                <div className="col-md-8">
+                  <label className="form-label">Category</label>
+                  <select
+                    className="form-select"
+                    defaultValue={"DEFAULT"}
+                    value={addCategory}
+                    onChange={(e) => setAddCategory(e.target.value)}
+                  >
+                    <option value="DEFAULT" disabled>
+                      SELECT CATEGORY
+                    </option>
+                    <option value="Shoes">Shoes</option>
+                    <option value="Clothes">Cloths</option>
+                  </select>
+                </div>
+              </div>
+              <div className="row profile-row justify-content-center mt-2">
+                <div className="col-md-8">
+                  <label className="form-label">Price</label>
+                  <input
+                    className="form-control"
+                    type="number"
+                    value={addPrice}
+                    onChange={(e) => setAddPrice(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="row profile-row justify-content-center mt-2">
+                <div className="col-md-8">
+                  <label className="form-label ">Description</label>
+                  <textarea
+                    className="form-control"
+                    value={addDescription}
+                    onChange={(e) => setAddDescription(e.target.value)}
+                  ></textarea>
+                </div>
+              </div>
+              <div className="row profile-row justify-content-center mt-2">
+                <div className="col-md-8">
+                  <label className="form-label">Quantity</label>
+                  <input
+                    className="form-control"
+                    type="number"
+                    value={addQuantity}
+                    onChange={(e) => setAddQuantity(e.target.value)}
+                  />
+                </div>
+              </div>
               <a
                 className="btn default-button mt-3"
                 role="button"
-                onClick={toggleAdd}
+                onClick={additem}
               >
                 Add
               </a>
@@ -116,11 +275,86 @@ export default function Shop() {
                   </a>
                 </div>
               </div>
-              <Form />
+              <div className="row profile-row justify-content-center">
+                <div className="col-md-8">
+                  <label className="form-label">Item Image</label>
+                  <div className="avatar">
+                    <div className="avatar-bg center"></div>
+                  </div>
+                  <input
+                    className="form-control"
+                    type="file"
+                    name="avatar-file"
+                    value={editImage}
+                    onChange={(e) => setEditImage(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="row profile-row justify-content-center mt-2">
+                <div className="col-md-8">
+                  <label className="form-label">Item Name</label>
+                  <input
+                    className="form-control"
+                    type="text"
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="row profile-row justify-content-center mt-2">
+                <div className="col-md-8">
+                  <label className="form-label">Category</label>
+                  <select
+                    className="form-select"
+                    defaultValue={"DEFAULT"}
+                    value={editCategory}
+                    onChange={(e) => setEditCategory(e.target.value)}
+                  >
+                    <option value="DEFAULT" disabled>
+                      SELECT CATEGORY
+                    </option>
+                    <option value="Afghanistan">Shoes</option>
+                    <option value="Åland Islands">Cloths</option>
+                  </select>
+                </div>
+              </div>
+              <div className="row profile-row justify-content-center mt-2">
+                <div className="col-md-8">
+                  <label className="form-label">Price</label>
+                  <input
+                    className="form-control"
+                    type="number"
+                    value={editPrice}
+                    onChange={(e) => setEditPrice(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="row profile-row justify-content-center mt-2">
+                <div className="col-md-8">
+                  <label className="form-label ">Description</label>
+                  <textarea
+                    className="form-control"
+                    value={editDescription}
+                    onChange={(e) => setEditDescription(e.target.value)}
+                  ></textarea>
+                </div>
+              </div>
+              <div className="row profile-row justify-content-center mt-2">
+                <div className="col-md-8">
+                  <label className="form-label">Quantity</label>
+                  <input
+                    className="form-control"
+                    type="number"
+                    value={editQuantity}
+                    onChange={(e) => setEditQuantity(e.target.value)}
+                  />
+                </div>
+              </div>
+
               <a
                 className="btn default-button mt-3"
                 role="button"
-                onClick={toggleEdit}
+                onClick={edititem}
               >
                 Edit
               </a>

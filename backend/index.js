@@ -201,7 +201,7 @@ app.post("/checkshop", function (request, response) {
             "Content-Type": "text/plain",
           });
           // Redirect to home page
-          console.log("User Created");
+          console.log("Shop Created");
           response.end("SUCCESS");
         }
         response.end();
@@ -210,6 +210,47 @@ app.post("/checkshop", function (request, response) {
   } else {
     response.send("Please enter Shop name!");
     response.end();
+  }
+});
+
+app.post("/additem", function (request, response) {
+  // Capture the input fields
+  console.log(request.body);
+  // Ensure the input fields exists and are not empty
+  if (true) {
+    // Execute SQL query that'll select the account from the database based on the specified username and password
+    db.query(
+      "INSERT INTO `items`(`name`, `category`, `price`, `description`, `quantity`, `shop`) VALUES (?,?,?,?,?,?)",
+      [
+        request.body.name,
+        request.body.category,
+        request.body.price,
+        request.body.description,
+        request.body.quantity,
+        request.body.shop,
+      ],
+      function (error, results, fields) {
+        // If there is an issue with the query, output the error
+
+        console.log(results);
+        // If the account exists
+        if (error) {
+          throw error;
+        }
+        if (results) {
+          response.writeHead(200, {
+            "Content-Type": "text/plain",
+          });
+
+          console.log("Item Created");
+          response.end("SUCCESS");
+        }
+        console.log(results);
+        response.end("UNSUCCESS");
+      }
+    );
+  } else {
+    response.end("UNSUCCESS");
   }
 });
 
