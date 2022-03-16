@@ -61,7 +61,7 @@ export default function Profile() {
             <p>{userData.email}</p>
             <p>{userData.phone}</p>
             <p>{userData.gender}</p>
-            <p>{userData.birthday.slice(0, 10)}</p>
+            {/* <p>{userData.birthday.slice(0, 10)}</p> */}
             <p>{userData.address}</p>
             <p>{userData.city}</p>
             <p>{userData.country}</p>

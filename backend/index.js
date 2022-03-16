@@ -217,41 +217,91 @@ app.post("/additem", function (request, response) {
   // Capture the input fields
   console.log(request.body);
   // Ensure the input fields exists and are not empty
-  if (true) {
-    // Execute SQL query that'll select the account from the database based on the specified username and password
-    db.query(
-      "INSERT INTO `items`(`name`, `category`, `price`, `description`, `quantity`, `shop`) VALUES (?,?,?,?,?,?)",
-      [
-        request.body.name,
-        request.body.category,
-        request.body.price,
-        request.body.description,
-        request.body.quantity,
-        request.body.shop,
-      ],
-      function (error, results, fields) {
-        // If there is an issue with the query, output the error
 
-        console.log(results);
-        // If the account exists
-        if (error) {
-          throw error;
-        }
-        if (results) {
-          response.writeHead(200, {
-            "Content-Type": "text/plain",
-          });
+  // Execute SQL query that'll select the account from the database based on the specified username and password
+  db.query(
+    "INSERT INTO `items`(`name`, `category`, `price`, `description`, `quantity`, `shop`) VALUES (?,?,?,?,?,?)",
+    [
+      request.body.name,
+      request.body.category,
+      request.body.price,
+      request.body.description,
+      request.body.quantity,
+      request.body.shop,
+    ],
+    function (error, results, fields) {
+      // If there is an issue with the query, output the error
 
-          console.log("Item Created");
-          response.end("SUCCESS");
-        }
-        console.log(results);
-        response.end("UNSUCCESS");
+      console.log(results);
+      // If the account exists
+      if (error) {
+        throw error;
       }
-    );
-  } else {
-    response.end("UNSUCCESS");
-  }
+      if (results) {
+        response.writeHead(200, {
+          "Content-Type": "text/plain",
+        });
+
+        console.log("Item Created");
+        response.end("SUCCESS");
+      }
+      console.log(results);
+      response.end("UNSUCCESS");
+    }
+  );
+});
+
+// app.post("/edititem", function (request, response) {
+//   // Capture the input fields
+//   console.log(request.body);
+
+//     db.query(
+//       "INSERT INTO `items`(`name`, `category`, `price`, `description`, `quantity`, `shop`) VALUES (?,?,?,?,?,?)",
+//       [
+//         request.body.name,
+//         request.body.category,
+//         request.body.price,
+//         request.body.description,
+//         request.body.quantity,
+//         request.body.shop,
+//       ],
+//       function (error, results, fields) {
+//         // If there is an issue with the query, output the error
+
+//         console.log(results);
+//         // If the account exists
+//         if (error) {
+//           throw error;
+//         }
+//         if (results) {
+//           response.writeHead(200, {
+//             "Content-Type": "text/plain",
+//           });
+
+//           console.log("Item Created");
+//           response.end("SUCCESS");
+//         }
+//         console.log(results);
+//         response.end("UNSUCCESS");
+//       }
+//     );
+
+// });
+
+app.get("/getitems", function (request, response) {
+  let shop = request.query.shop;
+  db.query(
+    "SELECT * FROM `items` WHERE `shop` = ?",
+    [shop],
+    function (err, rows, fields) {
+      if (err) {
+        throw err;
+      } else {
+        console.log(rows);
+        response.json(rows);
+      }
+    }
+  );
 });
 
 app.listen("3001", () => {});
