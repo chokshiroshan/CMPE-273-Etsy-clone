@@ -159,7 +159,7 @@ app.post("/userupdate", function (request, response) {
             "Content-Type": "text/plain",
           });
           // Redirect to home page
-          console.log("User Updates");
+          console.log("User Updated");
           response.end("SUCCESS");
         }
         response.end("UNSUCCESS");
@@ -251,42 +251,40 @@ app.post("/additem", function (request, response) {
   );
 });
 
-// app.post("/edititem", function (request, response) {
-//   // Capture the input fields
-//   console.log(request.body);
+app.post("/edititem", function (request, response) {
+  // Capture the input fields
+  console.log(request.body);
 
-//     db.query(
-//       "INSERT INTO `items`(`name`, `category`, `price`, `description`, `quantity`, `shop`) VALUES (?,?,?,?,?,?)",
-//       [
-//         request.body.name,
-//         request.body.category,
-//         request.body.price,
-//         request.body.description,
-//         request.body.quantity,
-//         request.body.shop,
-//       ],
-//       function (error, results, fields) {
-//         // If there is an issue with the query, output the error
-
-//         console.log(results);
-//         // If the account exists
-//         if (error) {
-//           throw error;
-//         }
-//         if (results) {
-//           response.writeHead(200, {
-//             "Content-Type": "text/plain",
-//           });
-
-//           console.log("Item Created");
-//           response.end("SUCCESS");
-//         }
-//         console.log(results);
-//         response.end("UNSUCCESS");
-//       }
-//     );
-
-// });
+  db.query(
+    "UPDATE `items` SET `name`=?,`category`=?,`price`=?,`description`=?,`quantity`=? WHERE `shop` = ? AND `id` = ?",
+    [
+      request.body.name,
+      request.body.category,
+      request.body.price,
+      request.body.description,
+      request.body.quantity,
+      request.body.shop,
+      request.body.id,
+    ],
+    function (error, results, fields) {
+      // If there is an issue with the query, output the error
+      if (error) {
+        throw error;
+      }
+      // If the account exists
+      if (results) {
+        // Authenticate the user
+        response.writeHead(200, {
+          "Content-Type": "text/plain",
+        });
+        // Redirect to home page
+        // console.log(results);
+        response.end("SUCCESS");
+      }
+      response.end("UNSUCCESS");
+    }
+  );
+});
 
 app.get("/getitems", function (request, response) {
   let shop = request.query.shop;
