@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import Navbar from "../Navbar/Navbar";
 import Redirect from "../Redirect/Redirect";
+import { useLocation } from "react-router-dom";
 
 export default function ProductPage() {
+  const location = useLocation();
+  const item = location?.state;
+  const [quantity, setQuantity] = useState(1);
   return (
     <>
       <Redirect />
@@ -20,19 +24,23 @@ export default function ProductPage() {
             <img />
           </div>
           <div className="col-md-6">
-            <p>Shop Name</p>
-            <h1>Product Name</h1>
+            <p>{item.shop}</p>
+            <h1>{item.name}</h1>
             <p>
-              <strong>10$</strong>
+              <strong>{item.price}$</strong>
             </p>
-            <p>
-              Description: Since we want our counter to be the most functional
-              possible, we're going to add a button to reset the counter to
-              zero. Its event handler will reference a function that will just
-              set count and quantity state values to zero.
-            </p>
+            <p>Description: {item.description}</p>
             <label>Quantity</label>
-            <input className="form-control" type="number"></input>
+            <input
+              className="form-control"
+              type="number"
+              min="1"
+              max={item.quantity}
+              value={quantity}
+              onChange={(e) => {
+                setQuantity(e.target.value);
+              }}
+            ></input>
 
             <div className="row mt-2">
               <div className="col-md-6">

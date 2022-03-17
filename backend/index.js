@@ -253,7 +253,7 @@ app.post("/additem", function (request, response) {
 
 app.post("/edititem", function (request, response) {
   // Capture the input fields
-  console.log(request.body);
+  console.log("body: ", request.body);
 
   db.query(
     "UPDATE `items` SET `name`=?,`category`=?,`price`=?,`description`=?,`quantity`=? WHERE `shop` = ? AND `id` = ?",
@@ -286,6 +286,24 @@ app.post("/edititem", function (request, response) {
   );
 });
 
+app.delete("/deleteitem", function (req, res) {
+  console.log(req.body);
+  db.query(
+    "DELETE FROM `items` WHERE `id`=?",
+    [req.body.id],
+    function (error, results, fields) {
+      if (error) throw error;
+      if (results) {
+        res.writeHead(200, {
+          "Content-Type": "text/plain",
+        });
+        res.end("SUCCESS");
+      }
+      res.end("UNSUCCESS");
+    }
+  );
+});
+
 app.get("/getitems", function (request, response) {
   let shop = request.query.shop;
   db.query(
@@ -300,6 +318,18 @@ app.get("/getitems", function (request, response) {
       }
     }
   );
+});
+
+app.get("/getallitems", function (request, response) {
+  console.log("request: ", request);
+  db.query("SELECT * FROM `items`", function (err, rows, fields) {
+    if (err) {
+      throw err;
+    } else {
+      console.log(rows);
+      response.json(rows);
+    }
+  });
 });
 
 app.listen("3001", () => {});

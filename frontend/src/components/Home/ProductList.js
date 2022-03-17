@@ -1,18 +1,44 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-
+import React from "react";
+import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 export default function ProductList() {
+  const [items, setItems] = useState([[]]);
+  useEffect(() => {
+    async function getItems() {
+      const response = await axios.get("http://localhost:3001/getallitems");
+      setItems(response.data);
+    }
+    getItems();
+    console.log(items);
+  }, []);
   return (
-    <div className="row mt-5">
-            <div className="col-md-3">
-                <div className="card"><img className="card-img-top w-100 d-block"/>
-                    <div className="card-body">
-                        <h4 className="card-title">Title</h4>
-                        <p className="card-text">Nullam id dolor id nibh ultricies vehicula ut id elit. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus.</p><Link className="btn btn-primary default-button" type="button" to="/product">Buy</Link>
-                    </div>
-                </div>
+    <>
+      {items.map((item) => (
+        <div className="col-md-3">
+          <div className="card">
+            <img className="card-img-top w-100 d-block" />
+            <div className="card-body">
+              <h4 className="card-title">{item.name}</h4>
+              <p className="card-text">{item.description}</p>
+              <p className="card-text">
+                <b>Category: </b>
+                {item.category}
+              </p>
+              <p className="card-text">${item.price}</p>
+              <Link
+                className="btn btn-primary default-button"
+                type="button"
+                to="product"
+                state={item}
+              >
+                Buy
+              </Link>
             </div>
+          </div>
         </div>
-  )
+      ))}
+    </>
+  );
 }

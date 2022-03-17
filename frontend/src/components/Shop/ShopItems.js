@@ -11,21 +11,31 @@ export default function ShopItems(props) {
   const [editDescription, setEditDescription] = useState("");
   const [editPrice, setEditPrice] = useState("");
   const [editQuantity, setEditQuantity] = useState("");
+  const [id, setId] = useState("");
   const [edit, setEdit] = useState(false);
-  const [shop, setShop] = useState(props.shop);
-  console.log(shop);
-  const toggleEdit = () => {
+  const [myshop, setMyShop] = useState(props.shop);
+  console.log(myshop);
+  const toggleEdit = (id) => {
+    setId(id);
     setEdit(!edit);
   };
 
-  const edititem = () => {
+  const deleteItem = (id) => {
+    axios.delete("http://localhost:3001/deleteitem", {
+      data: { id: id },
+    });
+    setId(id);
+  };
+
+  const edititem = (id) => {
     const data = {
-      shop: shop,
+      shop: myshop,
       name: editName,
       category: editCategory,
       description: editDescription,
       price: editPrice,
       quantity: editQuantity,
+      id: id,
     };
     //set the with credentials to true
     axios.defaults.withCredentials = true;
@@ -34,11 +44,6 @@ export default function ShopItems(props) {
       if (response.data === "SUCCESS") {
         console.log("Status Code : ", response.status);
         setEdit(false);
-        setEditName("");
-        setEditCategory("");
-        setEditDescription("");
-        setEditPrice("");
-        setEditQuantity("");
       }
       if (response.data === "UNSUCCESS") {
         console.log(response.data);
@@ -48,38 +53,52 @@ export default function ShopItems(props) {
   useEffect(() => {
     async function getItems() {
       const response = await axios.get("http://localhost:3001/getitems", {
-        params: { shop: shop },
+        params: { shop: myshop },
       });
       setItems(response.data);
     }
     getItems();
-    console.log(items);
-  }, []);
+    // console.log(items);
+  }, [edit, props.update, id]);
   return (
     <>
-      <div className="col-md-3">
-        <div className="card" style={{ position: "inherit" }}>
-          <img className="card-img-top w-100 d-block" />
-          <div className="card-body">
-            {/* <h4 className="card-title">{items[0].name}</h4> */}
-            <p className="card-text">
-              Nullam id dolor id nibh ultricies vehicula ut id elit. Cras justo
-              odio, dapibus ac facilisis in, egestas eget quam. Donec id elit
-              non mi porta gravida at eget metus.
-            </p>
-            <a
-              className="btn btn-primary default-button"
-              type="button"
-              onClick={toggleEdit}
-            >
-              Edit
-            </a>
-            <a className="btn btn-primary default-button" type="button">
-              Delete
-            </a>
+      {items.map((item) => (
+        <div className="col-md-3">
+          <div className="card" style={{ position: "inherit" }}>
+            <img className="card-img-top w-100 d-block" />
+            <div className="card-body">
+              <h4 className="card-title">{item.name}</h4>
+              <p className="card-text">
+                <b>Description: </b>
+                {item.description}
+              </p>
+              <p className="card-text">
+                <b>Category: </b>
+                {item.category}
+              </p>
+              <p className="card-text">${item.price}</p>
+              <p className="card-text">
+                <b>Quantity: </b>
+                {item.quantity}
+              </p>
+              <a
+                className="btn btn-primary default-button"
+                type="button"
+                onClick={() => toggleEdit(item.id)}
+              >
+                Edit
+              </a>
+              <a
+                className="btn btn-primary default-button"
+                type="button"
+                onClick={() => deleteItem(item.id)}
+              >
+                Delete
+              </a>
+            </div>
           </div>
         </div>
-      </div>
+      ))}
       {edit && (
         <div className="modal-custom">
           <div onClick={toggleEdit} className="overlay-custom"></div>
@@ -129,11 +148,9 @@ export default function ShopItems(props) {
                   value={editCategory}
                   onChange={(e) => setEditCategory(e.target.value)}
                 >
-                  <option value="DEFAULT" disabled>
-                    SELECT CATEGORY
-                  </option>
-                  <option value="Afghanistan">Shoes</option>
-                  <option value="Åland Islands">Cloths</option>
+                  <option value="DEFAULT">SELECT CATEGORY</option>
+                  <option value="Shoes">Shoes</option>
+                  <option value="Clothes">Cloths</option>
                 </select>
               </div>
             </div>
@@ -173,7 +190,7 @@ export default function ShopItems(props) {
             <a
               className="btn default-button mt-3"
               role="button"
-              onClick={edititem}
+              onClick={() => edititem(id)}
             >
               Edit
             </a>

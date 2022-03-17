@@ -17,8 +17,10 @@ export default function Shop() {
   const [addDescription, setAddDescription] = useState("");
   const [addPrice, setAddPrice] = useState("");
   const [addQuantity, setAddQuantity] = useState("");
+  const [force, setForce] = useState(false);
 
   const shop = userData.shop;
+
   useEffect(() => {
     async function getUserData() {
       const response = await axios.get("http://localhost:3001/getuserdata", {
@@ -56,6 +58,7 @@ export default function Shop() {
         setAddDescription("");
         setAddPrice("");
         setAddQuantity("");
+        setForce(true);
       }
       if (response.data === "UNSUCCESS") {
         console.log(response.data);
@@ -193,18 +196,16 @@ export default function Shop() {
       </div>
       <div className="container">
         <div className="row">
+          <div className="col-md-12 " style={{ borderBottom: "1px solid" }}>
+            <h3>Sales Details</h3>
+          </div>
           <div className="col-md-12 mt-3">
             <h1>Items</h1>
           </div>
         </div>
+
         <div className="row mt-5">
-          <ShopItems shop={userData.shop} />
-          <div
-            className="col-md-3 offset-6"
-            style={{ borderLeft: "1px solid" }}
-          >
-            <h3>Sales Details</h3>
-          </div>
+          {shop ? <ShopItems shop={shop} update={force} /> : ""}
         </div>
       </div>
     </>

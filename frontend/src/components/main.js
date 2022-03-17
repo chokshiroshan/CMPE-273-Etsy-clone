@@ -1,4 +1,4 @@
-import React, { Component, useState } from "react";
+import React, { Component, useState, useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 import Home from "./Home/Home";
 import SignIn from "./SignIn/SignIn";
@@ -14,15 +14,28 @@ import Shop from "./Shop/Shop";
 import Search from "./Home/Search";
 import Favourites from "./Favourites/Favourites";
 import Cookies from "js-cookie";
+import axios from "axios";
 
 //Create a Main Component
 const Main = () => {
-  const auth = Cookies.get("auth");
+  const [userData, setUserData] = useState([]);
+  useEffect(() => {
+    async function getUserData() {
+      const response = await axios.get("http://localhost:3001/getuserdata", {
+        params: { user: Cookies.get("username") },
+      });
+      setUserData(response.data[0]);
+    }
+
+    getUserData();
+    console.log(userData.name);
+  }, []);
+
   return (
     <div>
       <Routes>
         {/*Render Different Component based on Route*/}
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Home userData={userData} />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signout" element={<SignOut />} />
         <Route path="/register" element={<Register />} />
@@ -34,10 +47,7 @@ const Main = () => {
         <Route path="/purchased" element={<Purchased />} />
         <Route path="/checkshop" element={<CheckShop />} />
         <Route path="/shop" element={<Shop />} />
-        <Route
-          path="/favourites"
-          element={auth ? <Favourites /> : <SignIn />}
-        ></Route>
+        <Route path="/favourites" element={<Favourites />}></Route>
       </Routes>
     </div>
   );
