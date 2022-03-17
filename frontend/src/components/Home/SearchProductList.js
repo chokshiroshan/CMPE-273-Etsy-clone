@@ -2,11 +2,11 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Cookies from "js-cookie";
 import Success from "../Success/Success";
 import Error from "../Error/Error";
-import Cookies from "js-cookie";
 
-export default function ProductList() {
+export default function SearchProductList(props) {
   const [items, setItems] = useState([[]]);
   const [favourites, setFavourites] = useState(0);
 
@@ -28,7 +28,9 @@ export default function ProductList() {
   };
   useEffect(() => {
     async function getItems() {
-      const response = await axios.get("http://localhost:3001/getallitems");
+      const response = await axios.get("http://localhost:3001/getsearchitems", {
+        params: { keyword: props.keyword },
+      });
       setItems(response.data);
     }
     getItems();

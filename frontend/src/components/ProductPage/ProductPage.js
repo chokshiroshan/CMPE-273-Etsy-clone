@@ -10,8 +10,10 @@ import axios from "axios";
 export default function ProductPage() {
   const location = useLocation();
   const item = location?.state;
+  console.log(item);
   const [quantity, setQuantity] = useState(1);
   const [favourites, setFavourites] = useState(0);
+  const [cart, setCart] = useState(0);
 
   const addfavourites = () => {
     const data = {
@@ -26,6 +28,23 @@ export default function ProductPage() {
       if (response.data === "UNSUCCESS") {
         console.log(response.data);
         setFavourites(2);
+      }
+    });
+  };
+
+  const addcart = () => {
+    const data = {
+      id: item.id,
+      user: Cookies.get("username"),
+    };
+    axios.post("http://127.0.0.1:3001/addcart", data).then((response) => {
+      if (response.data === "SUCCESS") {
+        console.log("Status Code : ", response.status);
+        setCart(1);
+      }
+      if (response.data === "UNSUCCESS") {
+        console.log(response.data);
+        setCart(2);
       }
     });
   };
@@ -66,13 +85,14 @@ export default function ProductPage() {
 
             <div className="row mt-2">
               <div className="col-md-6">
-                <a
+                <Link
                   className="btn btn-light action-button default-button"
                   role="button"
-                  href="#"
+                  to="/cart"
+                  onClick={addcart}
                 >
                   Add to Cart
-                </a>
+                </Link>
               </div>
               <div className="col-md-6">
                 <a
@@ -90,6 +110,14 @@ export default function ProductPage() {
                 <Error message="Already added" />
               ) : (
                 <Success message="Added to Favourites!" />
+              )}
+
+              {cart == 0 ? (
+                ""
+              ) : cart == 2 ? (
+                <Error message="Already added" />
+              ) : (
+                <Success message="Added to Cart!" />
               )}
             </div>
           </div>

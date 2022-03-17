@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import Navbar from "../Navbar/Navbar";
-import ProductList from "./ProductList";
 
 export default function Search() {
   const [sort, setSort] = useState(false);
@@ -13,7 +12,6 @@ export default function Search() {
   };
   return (
     <>
-      <Navbar loggedin={false} />
       <div className="container">
         <div className="row">
           <div className="col-md-6 mt-3">
@@ -110,7 +108,6 @@ export default function Search() {
             </div>
           </div>
         </div>
-        <ProductList />
       </div>
     </>
   );

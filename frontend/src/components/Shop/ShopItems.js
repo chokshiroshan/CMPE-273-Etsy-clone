@@ -153,13 +153,19 @@ export default function ShopItems(props) {
                 <label className="form-label">Category</label>
                 <select
                   className="form-select"
-                  defaultValue={"DEFAULT"}
+                  defaultValue={""}
                   value={editCategory}
                   onChange={(e) => setEditCategory(e.target.value)}
                 >
-                  <option value="DEFAULT">SELECT CATEGORY</option>
-                  <option value="Shoes">Shoes</option>
-                  <option value="Clothes">Cloths</option>
+                  <option value="">SELECT CATEGORY</option>
+                  <option value="Clothing & Shoes">Clothing & Shoes</option>
+                  <option value="Computers">Computers</option>
+                  <option value="Electronics">Electronics</option>
+                  <option value="Entertainment & Arts">
+                    Entertainment & Arts
+                  </option>
+                  <option value="Food & Gifts">Food & Gifts</option>
+                  <option value="Health & Beauty">Health & Beauty</option>
                 </select>
               </div>
             </div>

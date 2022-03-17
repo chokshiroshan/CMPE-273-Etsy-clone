@@ -1,26 +1,36 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Cookies from "js-cookie";
+import { useLocation } from "react-router";
 
 export default function Navbar(props) {
   let buttons;
   let auth = Cookies.get("auth");
+  let location = useLocation();
+  console.log(location.pathname);
+  const search = (
+    <form className="me-auto search-form" target="_self">
+      <div className="d-flex align-items-center">
+        <label className="form-label d-flex mb-0" htmlFor="search-field">
+          <i className="fa fa-search"></i>
+        </label>
+        <input
+          className="form-control search-field"
+          type="search"
+          id="search-field"
+          name="search"
+        />
+      </div>
+    </form>
+  );
   if (auth) {
     buttons = (
       <>
-        <form className="me-auto search-form" target="_self">
-          <div className="d-flex align-items-center">
-            <label className="form-label d-flex mb-0" htmlFor="search-field">
-              <i className="fa fa-search"></i>
-            </label>
-            <input
-              className="form-control search-field"
-              type="search"
-              id="search-field"
-              name="search"
-            />
-          </div>
-        </form>
+        {location.pathname == "/" ? (
+          search
+        ) : (
+          <div className="me-auto search-form"></div>
+        )}
         <Link
           className="btn btn-light action-button"
           role="button"
