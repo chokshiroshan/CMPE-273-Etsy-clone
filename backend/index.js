@@ -321,7 +321,6 @@ app.get("/getitems", function (request, response) {
 });
 
 app.get("/getallitems", function (request, response) {
-  console.log("request: ", request);
   db.query("SELECT * FROM `items`", function (err, rows, fields) {
     if (err) {
       throw err;
@@ -380,20 +379,74 @@ app.get("/getfavourites", function (request, response) {
         let array = [];
         rows.map((row) => array.push(row.id));
         console.log("array: " + array);
-        const query =
-          "SELECT * FROM `items` WHERE `id` in (?" +
-          ",?".repeat(array.length - 1) +
-          ")";
-        console.log(query);
-        db.query(query, array, function (err, rows, fields) {
-          if (err) {
-            throw err;
-          } else {
-            console.log(rows);
-            response.json(rows);
-          }
-        });
+        if (array.length > 0) {
+          const query =
+            "SELECT * FROM `items` WHERE `id` in (?" +
+            ",?".repeat(array.length - 1) +
+            ")";
+          console.log(query);
+          db.query(query, array, function (err, rows, fields) {
+            if (err) {
+              throw err;
+            } else {
+              console.log(rows);
+              response.json(rows);
+            }
+          });
+        } else {
+          response.end("EMPTY");
+        }
       }
+    }
+  );
+});
+
+app.get("/getsearchitems", function (request, response) {
+  console.log("request: ", request.query);
+  // const query = ;
+  // console.log(query);
+  db.query(
+    "SELECT * FROM `items` WHERE `name` LIKE '%" + request.query.keyword + "%'",
+    function (err, rows, fields) {
+      if (err) {
+        throw err;
+      } else {
+        console.log(rows);
+        response.json(rows);
+      }
+    }
+  );
+});
+
+app.post("/addfavourites", function (request, response) {
+  // Capture the input fields
+  console.log(request.body);
+
+  db.query(
+    "INSERT INTO `favourites`(`id`, `user`) VALUES (?,?)",
+    [request.body.id, request.body.user],
+    function (error, results, fields) {
+      // If there is an issue with the query, output the error
+
+      console.log(results);
+      // If the account exists
+      if (error) {
+        if (error.errno == 1062) {
+          console.log("Aready Added to Favourites");
+
+          response.end("UNSUCCESS");
+        }
+      }
+      if (results) {
+        response.writeHead(200, {
+          "Content-Type": "text/plain",
+        });
+
+        console.log("Added to Favourites");
+        response.end("SUCCESS");
+      }
+      console.log(results);
+      response.end("UNSUCCESS");
     }
   );
 });
