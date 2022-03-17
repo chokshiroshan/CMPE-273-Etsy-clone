@@ -11,20 +11,20 @@ export default function ShopItems(props) {
   const [editDescription, setEditDescription] = useState("");
   const [editPrice, setEditPrice] = useState("");
   const [editQuantity, setEditQuantity] = useState("");
-  const [id, setId] = useState("");
+  const [item, setItem] = useState("");
   const [edit, setEdit] = useState(false);
   const [myshop, setMyShop] = useState(props.shop);
   console.log(myshop);
-  const toggleEdit = (id) => {
-    setId(id);
+  const toggleEdit = (item) => {
+    setItem(item);
     setEdit(!edit);
   };
 
-  const deleteItem = (id) => {
+  const deleteItem = (item) => {
     axios.delete("http://localhost:3001/deleteitem", {
-      data: { id: id },
+      data: { id: item.id },
     });
-    setId(id);
+    setItem(item);
   };
 
   const edititem = (id) => {
@@ -59,7 +59,16 @@ export default function ShopItems(props) {
     }
     getItems();
     // console.log(items);
-  }, [edit, props.update, id]);
+  }, [edit, props.update, item]);
+
+  const fill = (item) => {
+    setEditImage(item.image);
+    setEditName(item.name);
+    setEditCategory(item.category);
+    setEditDescription(item.description);
+    setEditPrice(item.price);
+    setEditQuantity(item.quantity);
+  };
   return (
     <>
       {items.map((item) => (
@@ -84,14 +93,14 @@ export default function ShopItems(props) {
               <a
                 className="btn btn-primary default-button"
                 type="button"
-                onClick={() => toggleEdit(item.id)}
+                onClick={() => toggleEdit(item)}
               >
                 Edit
               </a>
               <a
                 className="btn btn-primary default-button"
                 type="button"
-                onClick={() => deleteItem(item.id)}
+                onClick={() => deleteItem(item)}
               >
                 Delete
               </a>
@@ -190,9 +199,16 @@ export default function ShopItems(props) {
             <a
               className="btn default-button mt-3"
               role="button"
-              onClick={() => edititem(id)}
+              onClick={() => edititem(item.id)}
             >
               Edit
+            </a>
+            <a
+              className="btn default-button mt-3"
+              role="button"
+              onClick={() => fill(item)}
+            >
+              Fill with old data
             </a>
           </div>
         </div>

@@ -1,12 +1,34 @@
 import React, { useState } from "react";
 import Navbar from "../Navbar/Navbar";
 import Redirect from "../Redirect/Redirect";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import Success from "../Success/Success";
+import Error from "../Error/Error";
+import Cookies from "js-cookie";
+import axios from "axios";
 
 export default function ProductPage() {
   const location = useLocation();
   const item = location?.state;
   const [quantity, setQuantity] = useState(1);
+  const [favourites, setFavourites] = useState(0);
+
+  const addfavourites = () => {
+    const data = {
+      id: item.id,
+      user: Cookies.get("username"),
+    };
+    axios.post("http://127.0.0.1:3001/addfavourites", data).then((response) => {
+      if (response.data === "SUCCESS") {
+        console.log("Status Code : ", response.status);
+        setFavourites(1);
+      }
+      if (response.data === "UNSUCCESS") {
+        console.log(response.data);
+        setFavourites(2);
+      }
+    });
+  };
   return (
     <>
       <Redirect />
@@ -56,11 +78,19 @@ export default function ProductPage() {
                 <a
                   className="btn btn-light action-button default-button"
                   role="button"
-                  href="#"
+                  onClick={addfavourites}
                 >
                   Add to Favourites
                 </a>
               </div>
+
+              {favourites == 0 ? (
+                ""
+              ) : favourites == 2 ? (
+                <Error message="Already added" />
+              ) : (
+                <Success message="Added to Favourites!" />
+              )}
             </div>
           </div>
         </div>

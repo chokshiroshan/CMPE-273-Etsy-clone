@@ -2,17 +2,21 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Cookies from "js-cookie";
 
-export default function ProductList() {
+export default function FavouritesProductList() {
   const [items, setItems] = useState([[]]);
   useEffect(() => {
-    async function getItems() {
-      const response = await axios.get("http://localhost:3001/getallitems");
+    async function getFavourites() {
+      const response = await axios.get("http://localhost:3001/getfavourites", {
+        params: { user: Cookies.get("username") },
+      });
       setItems(response.data);
     }
-    getItems();
-    console.log(items);
+
+    getFavourites();
   }, []);
+
   return (
     <>
       {items.map((item) => (
@@ -33,7 +37,7 @@ export default function ProductList() {
                 <Link
                   className="btn btn-primary default-button"
                   type="button"
-                  to="product"
+                  to="/product"
                   state={item}
                 >
                   Buy

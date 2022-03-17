@@ -3,6 +3,7 @@ import Navbar from "../Navbar/Navbar";
 import ProductList from "../Home/ProductList";
 import { Link } from "react-router-dom";
 import Redirect from "../Redirect/Redirect";
+import FavouritesProductList from "./FavouritesProductList";
 
 export default function Favourites() {
   return (
@@ -34,7 +35,9 @@ export default function Favourites() {
           </div>
         </div>
         <hr />
-        <ProductList />
+        <div className="row mt-3">
+          <FavouritesProductList />
+        </div>
       </div>
     </>
   );
