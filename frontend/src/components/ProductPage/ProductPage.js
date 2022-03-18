@@ -36,6 +36,8 @@ export default function ProductPage() {
     const data = {
       id: item.id,
       user: Cookies.get("username"),
+      quantity: quantity,
+      rquantity: item.quantity - quantity,
     };
     axios.post("http://127.0.0.1:3001/addcart", data).then((response) => {
       if (response.data === "SUCCESS") {
@@ -85,14 +87,13 @@ export default function ProductPage() {
 
             <div className="row mt-2">
               <div className="col-md-6">
-                <Link
+                <a
                   className="btn btn-light action-button default-button"
                   role="button"
-                  to="/cart"
                   onClick={addcart}
                 >
                   Add to Cart
-                </Link>
+                </a>
               </div>
               <div className="col-md-6">
                 <a

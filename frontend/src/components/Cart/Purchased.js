@@ -27,7 +27,7 @@ export default function Purchased() {
                     </th>
                   </tr>
                 </thead>
-                <Item inCart={false} />
+                <Item />
               </table>
             </div>
           </div>

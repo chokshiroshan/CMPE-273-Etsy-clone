@@ -3,8 +3,62 @@ import { Link } from "react-router-dom";
 import Navbar from "../Navbar/Navbar";
 import Item from "./Item";
 import Redirect from "../Redirect/Redirect";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import Cookies from "js-cookie";
 
 export default function Cart() {
+  const [items, setItems] = useState([[]]);
+  const [empty, setEmpty] = useState(false);
+  const [total, setTotal] = useState(0);
+  const [item, setItem] = useState("");
+
+  useEffect(() => {
+    async function getCart() {
+      const response = await axios.get("http://localhost:3001/getcart", {
+        params: { user: Cookies.get("username") },
+      });
+      if (response.data != "EMPTY") {
+        setItems(response.data);
+      } else {
+        setEmpty(true);
+      }
+    }
+
+    getCart();
+  }, [item]);
+  useEffect(() => {
+    async function getTotal() {
+      const response = await axios.get("http://localhost:3001/getcarttotal", {
+        params: { user: Cookies.get("username") },
+      });
+      if (response.data != "EMPTY") {
+        setTotal(response.data);
+      } else {
+        setTotal(0);
+      }
+    }
+
+    getTotal();
+  }, [item]);
+
+  const addpurchased = () => {
+    // const data = {
+    //   id: item.id,
+    //   user: Cookies.get("username"),
+    // };
+    // axios.post("http://127.0.0.1:3001/addpurchased", data).then((response) => {
+    //   if (response.data === "SUCCESS") {
+    //     console.log("Status Code : ", response.status);
+    //     setFavourites(1);
+    //   }
+    //   if (response.data === "UNSUCCESS") {
+    //     console.log(response.data);
+    //     setFavourites(2);
+    //   }
+    // });
+  };
+
   return (
     <>
       <Redirect />
@@ -31,7 +85,7 @@ export default function Cart() {
                     </th>
                   </tr>
                 </thead>
-                <Item inCart={true} />
+                <Item item={item} setItem={setItem} />
               </table>
             </div>
           </div>
@@ -40,34 +94,19 @@ export default function Cart() {
         <div className="row bg-white rounded shadow-sm">
           <div className="col-lg-6 p-5 bg-white rounded shadow-sm offset-6">
             <div className="bg-light rounded-pill px-4 py-3 text-uppercase font-weight-bold">
-              Order summary{" "}
+              Order summary
             </div>
             <div className="p-4">
-              <p className="font-italic mb-4">
-                Shipping and additional costs are calculated based on values you
-                have entered.
-              </p>
               <ul className="list-unstyled mb-4">
                 <li className="d-flex justify-content-between py-3 border-bottom">
-                  <strong className="text-muted">Order Subtotal </strong>
-                  <strong>$390.00</strong>
-                </li>
-                <li className="d-flex justify-content-between py-3 border-bottom">
-                  <strong className="text-muted">Shipping and handling</strong>
-                  <strong>$10.00</strong>
-                </li>
-                <li className="d-flex justify-content-between py-3 border-bottom">
-                  <strong className="text-muted">Tax</strong>
-                  <strong>$0.00</strong>
-                </li>
-                <li className="d-flex justify-content-between py-3 border-bottom">
                   <strong className="text-muted">Total</strong>
-                  <h5 className="font-weight-bold">$400.00</h5>
+                  <h5 className="font-weight-bold">${total}</h5>
                 </li>
               </ul>
               <Link
                 to="/purchased"
                 className="btn btn-dark rounded-pill py-2 btn-block default-button"
+                onClick={addpurchased}
               >
                 Procceed to checkout
               </Link>
