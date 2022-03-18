@@ -591,37 +591,15 @@ app.get("/getpurchased", function (request, response) {
   // console.log(request.query);
 
   db.query(
-    "SELECT `id`,`quantity` FROM `purchased` WHERE `user` = ?",
+    "SELECT items.name, items.category, items.price, items.image, purchased.quantity FROM purchased INNER JOIN items ON purchased.id=items.id and purchased.user = ?",
     [request.query.user],
     function (err, rows, fields) {
       if (err) {
         throw err;
-      } else {
-        // console.log(rows);
-        let array = [];
-        let q = [];
-        rows.map((row) => array.push(row.id));
-        rows.map((row) => q.push(row.quantity));
-
-        // console.log("array: " + array);
-        if (array.length > 0) {
-          const query =
-            "SELECT * FROM `items` WHERE `id` in (?" +
-            ",?".repeat(array.length - 1) +
-            ")";
-          // console.log(query);
-          db.query(query, array, function (err, rows, fields) {
-            if (err) {
-              throw err;
-            } else {
-              rows.map((row, index) => (row.quantity = q[index]));
-              console.log("items: " + rows);
-              response.json(rows);
-            }
-          });
-        } else {
-          response.end("EMPTY");
-        }
+      }
+      if (rows) {
+        console.log(rows);
+        response.json(rows);
       }
     }
   );
