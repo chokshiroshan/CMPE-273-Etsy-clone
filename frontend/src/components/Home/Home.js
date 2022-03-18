@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Navbar from "../Navbar/Navbar";
 import Redirect from "../Redirect/Redirect";
 import ProductList from "./ProductList";
@@ -8,13 +8,14 @@ import Search from "./Search";
 
 export default function Home({ userData }) {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [filter, setFilter] = useState("");
   let search = searchParams.get("search");
   return (
     <>
       <Navbar />
       <div className="container">
         {search ? (
-          <Search />
+          <Search filter={filter} setFilter={setFilter} />
         ) : (
           <div>
             <div className="row">
@@ -30,7 +31,15 @@ export default function Home({ userData }) {
           </div>
         )}
         <div className="row mt-5">
-          {search ? <SearchProductList keyword={search} /> : <ProductList />}
+          {search ? (
+            <SearchProductList
+              keyword={search}
+              filter={filter}
+              setFilter={setFilter}
+            />
+          ) : (
+            <ProductList />
+          )}
         </div>
       </div>
     </>

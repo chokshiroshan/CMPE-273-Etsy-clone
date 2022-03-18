@@ -1,13 +1,17 @@
 import React, { useState } from "react";
 import Navbar from "../Navbar/Navbar";
 
-export default function Search() {
+export default function Search(props) {
   const [sort, setSort] = useState(false);
   const [filter, setFilter] = useState(false);
   const toggleSort = () => {
     setSort(!sort);
   };
   const toggleFilter = () => {
+    setFilter(!filter);
+  };
+  const postfilter = (f) => {
+    props.setFilter(f);
     setFilter(!filter);
   };
   return (
@@ -85,21 +89,21 @@ export default function Search() {
                   <a
                     className="dropdown-item"
                     href="#nogo"
-                    onClick={toggleFilter}
+                    onClick={() => postfilter(1)}
                   >
                     {"<50$"}
                   </a>
                   <a
                     className="dropdown-item"
                     href="#nogo"
-                    onClick={toggleFilter}
+                    onClick={() => postfilter(2)}
                   >
                     {">50$<100$"}
                   </a>
                   <a
                     className="dropdown-item"
                     href="#nogo"
-                    onClick={toggleFilter}
+                    onClick={() => postfilter(3)}
                   >
                     {">100$"}
                   </a>

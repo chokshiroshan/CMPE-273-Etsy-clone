@@ -6,6 +6,7 @@ import Redirect from "../Redirect/Redirect";
 import axios from "axios";
 import Cookies from "js-cookie";
 import ShopItems from "./ShopItems";
+import Sales from "./Sales";
 
 export default function Shop() {
   const [add, setAdd] = useState(false);
@@ -199,15 +200,10 @@ export default function Shop() {
         )}
       </div>
       <div className="container">
-        <div className="row">
-          <div className="col-md-12 " style={{ borderBottom: "1px solid" }}>
-            <h3>Sales Details</h3>
-          </div>
-          <div className="col-md-12 mt-3">
-            <h1>Items</h1>
-          </div>
+        <Sales shop={shop} />
+        <div className="col-md-12 mt-3">
+          <h1>Items</h1>
         </div>
-
         <div className="row mt-5">
           {shop ? <ShopItems shop={shop} update={force} /> : ""}
         </div>

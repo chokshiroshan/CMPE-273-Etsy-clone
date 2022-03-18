@@ -403,19 +403,76 @@ app.get("/getfavourites", function (request, response) {
 
 app.get("/getsearchitems", function (request, response) {
   console.log("request: ", request.query);
+  const filter = request.query.filter;
   // const query = ;
   // console.log(query);
-  db.query(
-    "SELECT * FROM `items` WHERE `name` LIKE '%" + request.query.keyword + "%'",
-    function (err, rows, fields) {
-      if (err) {
-        throw err;
-      } else {
-        console.log(rows);
-        response.json(rows);
-      }
+  if (filter) {
+    if (filter == 1) {
+      db.query(
+        "SELECT * FROM `items` WHERE `name` LIKE '%" +
+          request.query.keyword +
+          "%' AND `price` <50",
+        function (err, rows, fields) {
+          if (err) {
+            throw err;
+          } else {
+            console.log("filter");
+
+            console.log(rows);
+            response.json(rows);
+          }
+        }
+      );
+    } else if (filter == 2) {
+      db.query(
+        "SELECT * FROM `items` WHERE `name` LIKE '%" +
+          request.query.keyword +
+          "%' AND `price` >50 AND `price`<100",
+        function (err, rows, fields) {
+          if (err) {
+            throw err;
+          } else {
+            console.log("filter");
+
+            console.log(rows);
+            response.json(rows);
+          }
+        }
+      );
+    } else {
+      db.query(
+        "SELECT * FROM `items` WHERE `name` LIKE '%" +
+          request.query.keyword +
+          "%' AND `price` >100",
+        function (err, rows, fields) {
+          if (err) {
+            throw err;
+          } else {
+            console.log("filter");
+
+            console.log(rows);
+            response.json(rows);
+          }
+        }
+      );
     }
-  );
+  } else {
+    db.query(
+      "SELECT * FROM `items` WHERE `name` LIKE '%" +
+        request.query.keyword +
+        "%'",
+      function (err, rows, fields) {
+        if (err) {
+          throw err;
+        } else {
+          console.log("no filter");
+
+          console.log(rows);
+          response.json(rows);
+        }
+      }
+    );
+  }
 });
 
 app.post("/addcart", function (request, response) {
@@ -577,6 +634,17 @@ app.post("/addpurchased", function (request, response) {
     db.query(
       "DELETE FROM `cart` WHERE `id`=? AND `user`=?",
       [item.id, request.body.user],
+      function (error, results, fields) {
+        if (error) {
+          throw error;
+        }
+      }
+    );
+  });
+  items.map((item) => {
+    db.query(
+      "UPDATE `items` SET `sold`=`sold`+? WHERE `id` = ?",
+      [item.quantity, item.id],
       function (error, results, fields) {
         if (error) {
           throw error;

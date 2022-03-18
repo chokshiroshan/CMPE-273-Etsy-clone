@@ -29,15 +29,16 @@ export default function SearchProductList(props) {
   useEffect(() => {
     async function getItems() {
       const response = await axios.get("http://localhost:3001/getsearchitems", {
-        params: { keyword: props.keyword },
+        params: { keyword: props.keyword, filter: props.filter },
       });
       setItems(response.data);
     }
     getItems();
     console.log(items);
-  }, []);
+  }, [props.filter]);
   return (
     <>
+      {console.log("filter: " + props.filter)}
       {items.map((item) => (
         <div className="col-md-3">
           <div className="card">
