@@ -73,6 +73,12 @@ export default function Profile() {
               Update Profile
             </Link>
             {shop}
+            <Link
+              to="/purchased"
+              className="btn btn-dark rounded-pill py-2 btn-block default-button"
+            >
+              Previous Purchases
+            </Link>
           </div>
         </div>
       </div>

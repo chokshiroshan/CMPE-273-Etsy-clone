@@ -27,7 +27,7 @@ export default function Purchased() {
                     </th>
                   </tr>
                 </thead>
-                <Item />
+                <Item history={true} />
               </table>
             </div>
           </div>

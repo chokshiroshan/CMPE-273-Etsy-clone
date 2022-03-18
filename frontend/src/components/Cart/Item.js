@@ -4,41 +4,38 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 
-export default function Item({ item, setItem }) {
+export default function Item({ item, setItem, history }) {
   const [items, setItems] = useState([[]]);
   const [empty, setEmpty] = useState(false);
 
-  //   if (history) {
-  //     useEffect(() => {
-  //       async function getCart() {
-  //         const response = await axios.get("http://localhost:3001/getpurchased", {
-  //           params: { user: Cookies.get("username") },
-  //         });
-  //         if (response.data != "EMPTY") {
-  //           setItems(response.data);
-  //         } else {
-  //           setEmpty(true);
-  //         }
-  //       }
-
-  //       getCart();
-  //     }, [item]);
-  //   } else {
   useEffect(() => {
-    async function getCart() {
-      const response = await axios.get("http://localhost:3001/getcart", {
-        params: { user: Cookies.get("username") },
-      });
-      if (response.data != "EMPTY") {
-        setItems(response.data);
-      } else {
-        setEmpty(true);
+    if (history) {
+      async function getPurchased() {
+        const response = await axios.get("http://localhost:3001/getpurchased", {
+          params: { user: Cookies.get("username") },
+        });
+        if (response.data != "EMPTY") {
+          setItems(response.data);
+        } else {
+          setEmpty(true);
+        }
       }
-    }
+      getPurchased();
+    } else {
+      async function getCart() {
+        const response = await axios.get("http://localhost:3001/getcart", {
+          params: { user: Cookies.get("username") },
+        });
+        if (response.data != "EMPTY") {
+          setItems(response.data);
+        } else {
+          setEmpty(true);
+        }
+      }
 
-    getCart();
+      getCart();
+    }
   }, [item]);
-  //   }
 
   const deleteItem = (item) => {
     axios.delete("http://localhost:3001/deletecartitem", {
@@ -89,11 +86,15 @@ export default function Item({ item, setItem }) {
                 <td className="border-0 align-middle">
                   <strong>{item.quantity}</strong>
                 </td>
-                <td className="border-0 align-middle">
-                  <a className="text-dark" onClick={() => deleteItem(item)}>
-                    <i className="fa fa-trash"></i>
-                  </a>
-                </td>
+                {history ? (
+                  ""
+                ) : (
+                  <td className="border-0 align-middle">
+                    <a className="text-dark" onClick={() => deleteItem(item)}>
+                      <i className="fa fa-trash"></i>
+                    </a>
+                  </td>
+                )}
               </tr>
             </tbody>
           ))}

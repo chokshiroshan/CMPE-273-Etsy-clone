@@ -375,21 +375,21 @@ app.get("/getfavourites", function (request, response) {
       if (err) {
         throw err;
       } else {
-        console.log(rows);
+        // console.log(rows);
         let array = [];
         rows.map((row) => array.push(row.id));
-        console.log("array: " + array);
+        // console.log("array: " + array);
         if (array.length > 0) {
           const query =
             "SELECT * FROM `items` WHERE `id` in (?" +
             ",?".repeat(array.length - 1) +
             ")";
-          console.log(query);
+          // console.log(query);
           db.query(query, array, function (err, rows, fields) {
             if (err) {
               throw err;
             } else {
-              console.log(rows);
+              // console.log(rows);
               response.json(rows);
             }
           });
@@ -455,7 +455,7 @@ app.post("/addcart", function (request, response) {
 
 app.get("/getcart", function (request, response) {
   // Capture the input fields
-  console.log(request.query);
+  // console.log(request.query);
 
   db.query(
     "SELECT `id`,`quantity` FROM `cart` WHERE `user` = ?",
@@ -464,25 +464,25 @@ app.get("/getcart", function (request, response) {
       if (err) {
         throw err;
       } else {
-        console.log(rows);
+        // console.log(rows);
         let array = [];
         let q = [];
         rows.map((row) => array.push(row.id));
         rows.map((row) => q.push(row.quantity));
 
-        console.log("array: " + array);
+        // console.log("array: " + array);
         if (array.length > 0) {
           const query =
             "SELECT * FROM `items` WHERE `id` in (?" +
             ",?".repeat(array.length - 1) +
             ")";
-          console.log(query);
+          // console.log(query);
           db.query(query, array, function (err, rows, fields) {
             if (err) {
               throw err;
             } else {
               rows.map((row, index) => (row.quantity = q[index]));
-              console.log(rows);
+              // console.log("items: " + rows);
               response.json(rows);
             }
           });
@@ -519,7 +519,7 @@ app.delete("/deletecartitem", function (req, res) {
 
 app.get("/getcarttotal", function (request, response) {
   // Capture the input fields
-  console.log(request.query);
+  // console.log(request.query);
 
   db.query(
     "SELECT `id`,`quantity` FROM `cart` WHERE `user` = ?",
@@ -528,28 +528,95 @@ app.get("/getcarttotal", function (request, response) {
       if (err) {
         throw err;
       } else {
-        console.log(rows);
+        // console.log(rows);
         let array = [];
         let quantity = [];
 
         rows.map((row) => array.push(row.id));
         rows.map((row) => quantity.push(row.quantity));
 
-        console.log("array: " + array);
+        // console.log("array: " + array);
         if (array.length > 0) {
           const query =
             "SELECT * FROM `items` WHERE `id` in (?" +
             ",?".repeat(array.length - 1) +
             ")";
-          console.log(query);
+          // console.log(query);
           db.query(query, array, function (err, rows, fields) {
             if (err) {
               throw err;
             } else {
               let q = 0;
               rows.map((row, index) => (q = row.price * quantity[index] + q));
-              console.log(q);
+              // console.log(q);
               response.json(q);
+            }
+          });
+        } else {
+          response.end("EMPTY");
+        }
+      }
+    }
+  );
+});
+
+app.post("/addpurchased", function (request, response) {
+  const items = request.body.items;
+  items.map((item) => {
+    db.query(
+      "INSERT INTO `purchased`(`id`, `user`,`quantity`) VALUES (?,?,?)",
+      [item.id, request.body.user, item.quantity],
+      function (error, results, fields) {
+        if (error) {
+          throw error;
+        }
+      }
+    );
+  });
+  items.map((item) => {
+    db.query(
+      "DELETE FROM `cart` WHERE `id`=? AND `user`=?",
+      [item.id, request.body.user],
+      function (error, results, fields) {
+        if (error) {
+          throw error;
+        }
+      }
+    );
+  });
+});
+
+app.get("/getpurchased", function (request, response) {
+  // Capture the input fields
+  // console.log(request.query);
+
+  db.query(
+    "SELECT `id`,`quantity` FROM `purchased` WHERE `user` = ?",
+    [request.query.user],
+    function (err, rows, fields) {
+      if (err) {
+        throw err;
+      } else {
+        // console.log(rows);
+        let array = [];
+        let q = [];
+        rows.map((row) => array.push(row.id));
+        rows.map((row) => q.push(row.quantity));
+
+        // console.log("array: " + array);
+        if (array.length > 0) {
+          const query =
+            "SELECT * FROM `items` WHERE `id` in (?" +
+            ",?".repeat(array.length - 1) +
+            ")";
+          // console.log(query);
+          db.query(query, array, function (err, rows, fields) {
+            if (err) {
+              throw err;
+            } else {
+              rows.map((row, index) => (row.quantity = q[index]));
+              console.log("items: " + rows);
+              response.json(rows);
             }
           });
         } else {
