@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { serverUrl } from "./serverurl";
+import { serverUrl } from "../serverurl";
 
 export default function FavouritesProductList() {
   const [items, setItems] = useState([[]]);

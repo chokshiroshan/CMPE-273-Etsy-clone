@@ -3,7 +3,7 @@ import Navbar from "../Navbar/Navbar";
 import Cookies from "js-cookie";
 import { Navigate } from "react-router";
 import { useLocation } from "react-router-dom";
-import { serverUrl } from "./serverurl";
+import { serverUrl } from "../serverurl";
 
 const axios = require("axios");
 

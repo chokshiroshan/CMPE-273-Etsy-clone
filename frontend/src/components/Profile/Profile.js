@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import Redirect from "../Redirect/Redirect";
 import Cookies from "js-cookie";
 const axios = require("axios");
-import { serverUrl } from "./serverurl";
+import { serverUrl } from "../serverurl";
 
 export default function Profile() {
   const [userData, setUserData] = useState("");

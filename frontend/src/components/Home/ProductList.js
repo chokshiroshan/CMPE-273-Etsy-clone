@@ -5,7 +5,7 @@ import axios from "axios";
 import Success from "../Success/Success";
 import Error from "../Error/Error";
 import Cookies from "js-cookie";
-import { serverUrl } from "./serverurl";
+import { serverUrl } from "../serverurl";
 
 export default function ProductList() {
   const [items, setItems] = useState([[]]);

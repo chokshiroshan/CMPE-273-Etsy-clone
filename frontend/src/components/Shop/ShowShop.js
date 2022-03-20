@@ -5,7 +5,7 @@ import { useLocation } from "react-router";
 import ShowShopItems from "./ShowShopItems";
 import axios from "axios";
 import Footer from "../Footer/Footer";
-import { serverUrl } from "./serverurl";
+import { serverUrl } from "../serverurl";
 
 export default function ShowShop() {
   const location = useLocation();

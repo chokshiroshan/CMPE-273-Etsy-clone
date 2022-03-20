@@ -8,7 +8,7 @@ import Cookies from "js-cookie";
 import ShopItems from "./ShopItems";
 import Sales from "./Sales";
 import Footer from "../Footer/Footer";
-import { serverUrl } from "./serverurl";
+import { serverUrl } from "../serverurl";
 
 export default function Shop() {
   const [add, setAdd] = useState(false);

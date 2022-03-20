@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { Link } from "react-router-dom";
-import { serverUrl } from "../serverurl";
+import { serverUrl } from ".../serverurl";
 
 export default function ShowShopItems(props) {
   const [items, setItems] = useState([[]]);

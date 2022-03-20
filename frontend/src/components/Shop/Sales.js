@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { serverUrl } from "./serverurl";
+import { serverUrl } from "../serverurl";
 
 export default function Sales({ shop }) {
   const [items, setItems] = useState([[]]);

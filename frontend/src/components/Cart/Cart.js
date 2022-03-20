@@ -6,7 +6,7 @@ import Redirect from "../Redirect/Redirect";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { serverUrl } from "./serverurl";
+import { serverUrl } from "../serverurl";
 
 export default function Cart() {
   const [items, setItems] = useState([]);

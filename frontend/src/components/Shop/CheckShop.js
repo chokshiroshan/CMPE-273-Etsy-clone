@@ -4,7 +4,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { Navigate } from "react-router";
 import Error from "../Error/Error";
-import { serverUrl } from "./serverurl";
+import { serverUrl } from "../serverurl";
 
 export default function CheckShop() {
   const [shop, setShop] = useState("");

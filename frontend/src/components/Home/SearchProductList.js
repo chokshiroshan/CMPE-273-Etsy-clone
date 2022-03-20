@@ -5,7 +5,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import Success from "../Success/Success";
 import Error from "../Error/Error";
-import { serverUrl } from "./serverurl";
+import { serverUrl } from "../serverurl";
 
 export default function SearchProductList({ items }) {
   const [favourites, setFavourites] = useState(0);

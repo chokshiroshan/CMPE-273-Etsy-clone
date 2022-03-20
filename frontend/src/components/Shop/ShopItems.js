@@ -2,7 +2,7 @@ import React from "react";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { serverUrl } from "./serverurl";
+import { serverUrl } from "../serverurl";
 
 export default function ShopItems(props) {
   const [items, setItems] = useState([[]]);

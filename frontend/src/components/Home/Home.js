@@ -7,7 +7,7 @@ import SearchProductList from "./SearchProductList";
 import Search from "./Search";
 import axios from "axios";
 import Footer from "../Footer/Footer";
-import { serverUrl } from "./serverurl";
+import { serverUrl } from "../serverurl";
 
 export default function Home({ userData }) {
   const [searchParams, setSearchParams] = useSearchParams();

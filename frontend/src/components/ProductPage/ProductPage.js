@@ -7,7 +7,7 @@ import Error from "../Error/Error";
 import Cookies from "js-cookie";
 import axios from "axios";
 import Footer from "../Footer/Footer";
-import { serverUrl } from "./serverurl";
+import { serverUrl } from "../serverurl";
 
 export default function ProductPage() {
   const location = useLocation();
