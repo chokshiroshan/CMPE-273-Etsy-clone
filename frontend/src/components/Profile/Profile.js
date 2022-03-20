@@ -4,8 +4,8 @@ import ProductList from "../Home/ProductList";
 import { Link } from "react-router-dom";
 import Redirect from "../Redirect/Redirect";
 import Cookies from "js-cookie";
-const axios = require("axios");
 import { serverUrl } from "../serverurl";
+const axios = require("axios");
 
 export default function Profile() {
   const [userData, setUserData] = useState("");

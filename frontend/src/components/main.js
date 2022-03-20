@@ -16,7 +16,7 @@ import Search from "./Home/Search";
 import Favourites from "./Favourites/Favourites";
 import Cookies from "js-cookie";
 import axios from "axios";
-import { serverUrl } from "../serverurl";
+import { serverUrl } from "./serverurl";
 
 //Create a Main Component
 const Main = () => {

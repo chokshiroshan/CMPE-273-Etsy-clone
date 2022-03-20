@@ -4,7 +4,7 @@ import Error from "../Error/Error";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { Navigate } from "react-router";
-import { serverUrl } from ".../serverurl";
+import { serverUrl } from "../serverurl";
 
 export default function SignIn() {
   const [username, setUsername] = useState("");
