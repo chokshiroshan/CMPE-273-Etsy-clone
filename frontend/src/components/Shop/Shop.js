@@ -81,23 +81,21 @@ export default function Shop() {
     //set the with credentials to true
     axios.defaults.withCredentials = true;
     //make a post request with the user data
-    axios
-      .post("http://127.0.0.1:3001/additem", bodyFormData)
-      .then((response) => {
-        if (response.data === "SUCCESS") {
-          console.log("Status Code : ", response.status);
-          setAdd(false);
-          setAddName("");
-          setAddCategory("");
-          setAddDescription("");
-          setAddPrice("");
-          setAddQuantity("");
-          setForce(!force);
-        }
-        if (response.data === "UNSUCCESS") {
-          console.log(response.data);
-        }
-      });
+    axios.post(serverUrl + "/additem", bodyFormData).then((response) => {
+      if (response.data === "SUCCESS") {
+        console.log("Status Code : ", response.status);
+        setAdd(false);
+        setAddName("");
+        setAddCategory("");
+        setAddDescription("");
+        setAddPrice("");
+        setAddQuantity("");
+        setForce(!force);
+      }
+      if (response.data === "UNSUCCESS") {
+        console.log(response.data);
+      }
+    });
   };
 
   return (

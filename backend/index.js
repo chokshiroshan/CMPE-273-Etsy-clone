@@ -169,7 +169,7 @@ app.post("/userupdate", upload.single("file"), function (request, response) {
     console.log("File Renamed.");
   });
   // console.log(file);
-  image = "http://127.0.0.1:3001/images/users/" + username + ".jpeg";
+  image = "http://100.26.104.195:3001/images/users/" + username + ".jpeg";
   if (username) {
     db.query(
       "UPDATE `users` SET `image`=?,`name`=?,`email`=?,`phone`=?,`gender`=?,`birthday`=?,`address`=?,`city`=?,`country`=? WHERE `username` = ?",
@@ -260,7 +260,8 @@ app.post("/shopimage", upload.single("file"), function (request, response) {
     console.log("File Renamed.");
   });
   // console.log(file);
-  image = "http://127.0.0.1:3001/images/shops/" + request.body.shop + ".jpeg";
+  image =
+    "http://100.26.104.195:3001/images/shops/" + request.body.shop + ".jpeg";
   // Execute SQL query that'll select the account from the database based on the specified username and password
   db.query(
     "UPDATE `users` SET `shopimage`=? WHERE `shop` = ?",
@@ -299,7 +300,8 @@ app.post("/additem", upload.single("file"), function (request, response) {
     console.log("File Renamed.");
   });
   // console.log(file);
-  image = "http://127.0.0.1:3001/images/items/" + request.body.name + ".jpeg";
+  image =
+    "http://100.26.104.195:3001/images/items/" + request.body.name + ".jpeg";
   // Execute SQL query that'll select the account from the database based on the specified username and password
   db.query(
     "INSERT INTO `items`(`image`,`name`, `category`, `price`, `description`, `quantity`, `shop`) VALUES (?,?,?,?,?,?,?)",
@@ -337,7 +339,8 @@ app.post("/additem", upload.single("file"), function (request, response) {
 app.post("/edititem", upload.single("file"), function (request, response) {
   // Capture the input fields
   console.log("body: ", request.body);
-  image = "http://127.0.0.1:3001/images/items/" + request.body.name + ".jpeg";
+  image =
+    "http://100.26.104.195:3001/images/items/" + request.body.name + ".jpeg";
   fs.rename("public/images/items/file.jpeg", image, function (err) {
     if (err) {
       console.log(err);
