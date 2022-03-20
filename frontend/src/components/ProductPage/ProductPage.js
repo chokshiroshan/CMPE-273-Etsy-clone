@@ -66,7 +66,7 @@ export default function ProductPage() {
       <div className="container">
         <div className="row">
           <div className="col-md-6">
-            <img src="item.image" />
+            <img src={item.image} />
           </div>
           <div className="col-md-6">
             <Link to={"/showshop"} state={item.shop}>
