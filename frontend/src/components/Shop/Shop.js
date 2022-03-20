@@ -38,33 +38,40 @@ export default function Shop() {
     setAdd(!add);
   };
 
+  const fileHandler = (event) => {
+    setAddImage(event.target.files[0]);
+  };
+
   const additem = () => {
-    const data = {
-      shop: shop,
-      name: addName,
-      category: addCategory,
-      description: addDescription,
-      price: addPrice,
-      quantity: addQuantity,
-    };
+    var bodyFormData = new FormData();
+    bodyFormData.append("file", addImage);
+    bodyFormData.append("shop", shop);
+    bodyFormData.append("name", addName);
+    bodyFormData.append("category", addCategory);
+    bodyFormData.append("description", addDescription);
+    bodyFormData.append("price", addPrice);
+    bodyFormData.append("quantity", addQuantity);
+
     //set the with credentials to true
     axios.defaults.withCredentials = true;
     //make a post request with the user data
-    axios.post("http://127.0.0.1:3001/additem", data).then((response) => {
-      if (response.data === "SUCCESS") {
-        console.log("Status Code : ", response.status);
-        setAdd(false);
-        setAddName("");
-        setAddCategory("");
-        setAddDescription("");
-        setAddPrice("");
-        setAddQuantity("");
-        setForce(true);
-      }
-      if (response.data === "UNSUCCESS") {
-        console.log(response.data);
-      }
-    });
+    axios
+      .post("http://127.0.0.1:3001/additem", bodyFormData)
+      .then((response) => {
+        if (response.data === "SUCCESS") {
+          console.log("Status Code : ", response.status);
+          setAdd(false);
+          setAddName("");
+          setAddCategory("");
+          setAddDescription("");
+          setAddPrice("");
+          setAddQuantity("");
+          setForce(!force);
+        }
+        if (response.data === "UNSUCCESS") {
+          console.log(response.data);
+        }
+      });
   };
 
   return (
@@ -118,9 +125,8 @@ export default function Shop() {
                   <input
                     className="form-control"
                     type="file"
-                    name="avatar-file"
-                    value={addImage}
-                    onChange={(e) => setAddImage(e.target.value)}
+                    name="file"
+                    onChange={fileHandler}
                   />
                 </div>
               </div>
@@ -138,13 +144,17 @@ export default function Shop() {
               <div className="row profile-row justify-content-center mt-2">
                 <div className="col-md-8">
                   <label className="form-label">Category</label>
-                  <select
+                  <input
+                    list="category"
+                    id="category-list"
+                    name="category"
                     className="form-select"
                     defaultValue={""}
                     value={addCategory}
                     onChange={(e) => setAddCategory(e.target.value)}
-                  >
-                    <option value="">SELECT CATEGORY</option>
+                  />
+
+                  <datalist id="category">
                     <option value="Clothing & Shoes">Clothing & Shoes</option>
                     <option value="Computers">Computers</option>
                     <option value="Electronics">Electronics</option>
@@ -153,7 +163,7 @@ export default function Shop() {
                     </option>
                     <option value="Food & Gifts">Food & Gifts</option>
                     <option value="Health & Beauty">Health & Beauty</option>
-                  </select>
+                  </datalist>
                 </div>
               </div>
               <div className="row profile-row justify-content-center mt-2">
@@ -162,6 +172,7 @@ export default function Shop() {
                   <input
                     className="form-control"
                     type="number"
+                    step="0.01"
                     value={addPrice}
                     onChange={(e) => setAddPrice(e.target.value)}
                   />
@@ -205,7 +216,11 @@ export default function Shop() {
           <h1>Items</h1>
         </div>
         <div className="row mt-5">
-          {shop ? <ShopItems shop={shop} update={force} /> : ""}
+          {shop ? (
+            <ShopItems shop={shop} force={force} setForce={setForce} />
+          ) : (
+            ""
+          )}
         </div>
       </div>
     </>

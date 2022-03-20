@@ -7,6 +7,7 @@ import Cookies from "js-cookie";
 export default function FavouritesProductList() {
   const [items, setItems] = useState([[]]);
   const [empty, setEmpty] = useState(false);
+  const [remove, setRemove] = useState("");
 
   useEffect(() => {
     async function getFavourites() {
@@ -21,7 +22,14 @@ export default function FavouritesProductList() {
     }
 
     getFavourites();
-  }, []);
+  }, [remove]);
+
+  const removefavourite = (item) => {
+    axios.delete("http://localhost:3001/removefavourite", {
+      data: { id: item.id, username: Cookies.get("username") },
+    });
+    setRemove(item);
+  };
 
   return (
     <>
@@ -53,6 +61,13 @@ export default function FavouritesProductList() {
                       Buy
                     </Link>
                   )}
+                  <a
+                    className="btn btn-primary default-button"
+                    type="button"
+                    onClick={() => removefavourite(item)}
+                  >
+                    Remove
+                  </a>
                 </div>
               </div>
             </div>

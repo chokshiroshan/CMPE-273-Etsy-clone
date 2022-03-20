@@ -8,6 +8,7 @@ import { Navigate } from "react-router";
 
 export default function Register() {
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [invalid, setInvalid] = useState(false);
@@ -19,6 +20,7 @@ export default function Register() {
     const data = {
       username: username,
       password: password,
+      email: email,
     };
     //set the with credentials to true
     axios.defaults.withCredentials = true;
@@ -56,6 +58,17 @@ export default function Register() {
           required=""
           autoFocus=""
           onChange={(e) => setUsername(e.target.value)}
+        />
+        <input
+          type="email"
+          id="inputEmail"
+          className="form-control"
+          placeholder="email"
+          name="email"
+          value={email}
+          required=""
+          autoFocus=""
+          onChange={(e) => setEmail(e.target.value)}
         />
         <label htmlFor="inputPassword" className="sr-only">
           Password

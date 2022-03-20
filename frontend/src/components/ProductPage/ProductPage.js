@@ -67,7 +67,9 @@ export default function ProductPage() {
             <img />
           </div>
           <div className="col-md-6">
-            <p>{item.shop}</p>
+            <Link to={"/showshop"} state={item.shop}>
+              {item.shop}
+            </Link>
             <h1>{item.name}</h1>
             <p>
               <strong>{item.price}$</strong>

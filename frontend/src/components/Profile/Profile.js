@@ -56,7 +56,7 @@ export default function Profile() {
       <div className="container">
         <div className="row">
           <div className="col-md-12 mt-3">
-            <img src={userData.image}></img>
+            <img src={userData.image} width="150px"></img>
             <h1>{userData.username}</h1>
             <p>{userData.email}</p>
             <p>{userData.phone}</p>
@@ -69,6 +69,7 @@ export default function Profile() {
               className="btn btn-primary default-button"
               to="/update"
               role="button"
+              state={userData}
             >
               Update Profile
             </Link>

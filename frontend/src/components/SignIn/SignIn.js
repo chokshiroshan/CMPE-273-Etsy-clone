@@ -55,7 +55,7 @@ export default function SignIn() {
           placeholder="Username"
           required=""
           autoFocus=""
-          name="username"
+          name="email"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />

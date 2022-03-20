@@ -2,8 +2,9 @@ const express = require("express");
 const mysql = require("mysql");
 const session = require("express-session");
 const cors = require("cors");
-const fileUpload = require("express-fileupload");
 const bodyParser = require("body-parser");
+const multer = require("multer");
+const fs = require("fs");
 
 const app = express();
 
@@ -13,8 +14,30 @@ const db = mysql.createConnection({
   database: "lab",
 });
 
+const fileStorageEngine = multer.diskStorage({
+  destination: (req, file, cb) => {
+    console.log(req);
+    if (req.path == "/userupdate") {
+      cb(null, "./public/images/users");
+    } else {
+      cb(null, "./public/images/items");
+    }
+  },
+  filename: (req, file, cb) => {
+    let extArray = file.mimetype.split("/");
+    let extension = extArray[extArray.length - 1];
+    console.log(file);
+    cb(null, file.fieldname + ".jpeg");
+  },
+});
+
+const upload = multer({ storage: fileStorageEngine });
+
+app.use(express.static("public"));
+app.use("/images", express.static("images"));
+
 app.use(cors({ origin: "http://localhost:3000", credentials: true }));
-app.use(fileUpload());
+
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 // app.use(bodyParser.json());
@@ -75,14 +98,15 @@ app.post("/login", function (request, response) {
 app.post("/register", function (request, response) {
   // Capture the input fields
   let username = request.body.username;
+  let email = request.body.email;
   let password = request.body.password;
   console.log(request.body);
   // Ensure the input fields exists and are not empty
   if (username && password) {
     // Execute SQL query that'll select the account from the database based on the specified username and password
     db.query(
-      "INSERT INTO `users`(`username`, `password`) VALUES (?,?)",
-      [username, password],
+      "INSERT INTO `users`(`username`, `password`,`email`) VALUES (?,?,?)",
+      [username, password, email],
       function (error, results, fields) {
         // If there is an issue with the query, output the error
 
@@ -130,14 +154,22 @@ app.get("/getuserdata", function (request, response) {
   );
 });
 
-app.post("/userupdate", function (request, response) {
+app.post("/userupdate", upload.single("file"), function (request, response) {
   let username = request.body.username;
-  console.log(request.body);
-
+  image = "public/images/users/" + username + ".jpeg";
+  fs.rename("public/images/users/file.jpeg", image, function (err) {
+    if (err) {
+      console.log(err);
+    }
+    console.log("File Renamed.");
+  });
+  // console.log(file);
+  image = "http://127.0.0.1:3001/images/users/" + username + ".jpeg";
   if (username) {
     db.query(
-      "UPDATE `users` SET `name`=?,`email`=?,`phone`=?,`gender`=?,`birthday`=?,`address`=?,`city`=?,`country`=? WHERE `username` = ?",
+      "UPDATE `users` SET `image`=?,`name`=?,`email`=?,`phone`=?,`gender`=?,`birthday`=?,`address`=?,`city`=?,`country`=? WHERE `username` = ?",
       [
+        image,
         request.body.name,
         request.body.email,
         request.body.phone,
@@ -150,9 +182,7 @@ app.post("/userupdate", function (request, response) {
       ],
       function (error, results, fields) {
         // If there is an issue with the query, output the error
-
-        console.log(results);
-
+        console.log(error);
         if (results) {
           // Authenticate the user
           response.writeHead(200, {
@@ -213,15 +243,24 @@ app.post("/checkshop", function (request, response) {
   }
 });
 
-app.post("/additem", function (request, response) {
+app.post("/additem", upload.single("file"), function (request, response) {
   // Capture the input fields
   console.log(request.body);
   // Ensure the input fields exists and are not empty
-
+  image = "public/images/items/" + request.body.name + ".jpeg";
+  fs.rename("public/images/items/file.jpeg", image, function (err) {
+    if (err) {
+      console.log(err);
+    }
+    console.log("File Renamed.");
+  });
+  // console.log(file);
+  image = "http://127.0.0.1:3001/images/items/" + request.body.name + ".jpeg";
   // Execute SQL query that'll select the account from the database based on the specified username and password
   db.query(
-    "INSERT INTO `items`(`name`, `category`, `price`, `description`, `quantity`, `shop`) VALUES (?,?,?,?,?,?)",
+    "INSERT INTO `items`(`image`,`name`, `category`, `price`, `description`, `quantity`, `shop`) VALUES (?,?,?,?,?,?,?)",
     [
+      image,
       request.body.name,
       request.body.category,
       request.body.price,
@@ -251,13 +290,21 @@ app.post("/additem", function (request, response) {
   );
 });
 
-app.post("/edititem", function (request, response) {
+app.post("/edititem", upload.single("file"), function (request, response) {
   // Capture the input fields
   console.log("body: ", request.body);
+  image = "http://127.0.0.1:3001/images/items/" + request.body.name + ".jpeg";
+  fs.rename("public/images/items/file.jpeg", image, function (err) {
+    if (err) {
+      console.log(err);
+    }
+    console.log("File Renamed.");
+  });
 
   db.query(
-    "UPDATE `items` SET `name`=?,`category`=?,`price`=?,`description`=?,`quantity`=? WHERE `shop` = ? AND `id` = ?",
+    "UPDATE `items` SET `image`=?,`name`=?,`category`=?,`price`=?,`description`=?,`quantity`=? WHERE `shop` = ? AND `id` = ?",
     [
+      image,
       request.body.name,
       request.body.category,
       request.body.price,
@@ -313,6 +360,22 @@ app.get("/getitems", function (request, response) {
       if (err) {
         throw err;
       } else {
+        // console.log(rows);
+        response.json(rows);
+      }
+    }
+  );
+});
+
+app.get("/getshopowner", function (request, response) {
+  let shop = request.query.shop;
+  db.query(
+    "SELECT `name`,`email`,`phone` FROM `users` WHERE `shop` = ?",
+    [shop],
+    function (err, rows, fields) {
+      if (err) {
+        throw err;
+      } else {
         console.log(rows);
         response.json(rows);
       }
@@ -360,6 +423,24 @@ app.post("/addfavourites", function (request, response) {
       }
       console.log(results);
       response.end("UNSUCCESS");
+    }
+  );
+});
+
+app.delete("/removefavourite", function (req, res) {
+  console.log(req.body);
+  db.query(
+    "DELETE FROM `favourites` WHERE `id`=? AND `user`=?",
+    [req.body.id, req.body.username],
+    function (error, results, fields) {
+      if (error) throw error;
+      if (results) {
+        res.writeHead(200, {
+          "Content-Type": "text/plain",
+        });
+        res.end("SUCCESS");
+      }
+      res.end("UNSUCCESS");
     }
   );
 });

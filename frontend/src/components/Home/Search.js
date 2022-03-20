@@ -14,8 +14,15 @@ export default function Search(props) {
     props.setFilter(f);
     setFilter(!filter);
   };
+
+  const sortItems = (sortby) => {
+    props.items.sort(props.compareValues(sortby));
+    setSort(!sort);
+    props.setSort(props.sort);
+  };
   return (
     <>
+      {/* {console.log(props.items.sort(() => comparePrice()))} */}
       <div className="container">
         <div className="row">
           <div className="col-md-6 mt-3">
@@ -45,21 +52,21 @@ export default function Search(props) {
                   <a
                     className="dropdown-item"
                     href="#nogo"
-                    onClick={toggleSort}
+                    onClick={() => sortItems("price")}
                   >
                     Price
                   </a>
                   <a
                     className="dropdown-item"
                     href="#nogo"
-                    onClick={toggleSort}
+                    onClick={() => sortItems("quantity")}
                   >
                     Quantity
                   </a>
                   <a
                     className="dropdown-item"
                     href="#nogo"
-                    onClick={toggleSort}
+                    onClick={() => sortItems("sold")}
                   >
                     Sales
                   </a>

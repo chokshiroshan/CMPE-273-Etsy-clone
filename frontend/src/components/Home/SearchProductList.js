@@ -6,8 +6,7 @@ import Cookies from "js-cookie";
 import Success from "../Success/Success";
 import Error from "../Error/Error";
 
-export default function SearchProductList(props) {
-  const [items, setItems] = useState([[]]);
+export default function SearchProductList({ items }) {
   const [favourites, setFavourites] = useState(0);
 
   const addfavourites = (id) => {
@@ -26,23 +25,14 @@ export default function SearchProductList(props) {
       }
     });
   };
-  useEffect(() => {
-    async function getItems() {
-      const response = await axios.get("http://localhost:3001/getsearchitems", {
-        params: { keyword: props.keyword, filter: props.filter },
-      });
-      setItems(response.data);
-    }
-    getItems();
-    console.log(items);
-  }, [props.filter]);
+
   return (
     <>
-      {console.log("filter: " + props.filter)}
+      {console.log("items: " + items[0])}
       {items.map((item) => (
         <div className="col-md-3">
           <div className="card">
-            <img className="card-img-top w-100 d-block" />
+            <img className="card-img-top w-100 d-block" src={item.image} />
             <div className="card-body">
               <h4 className="card-title">{item.name}</h4>
               <p className="card-text">{item.description}</p>

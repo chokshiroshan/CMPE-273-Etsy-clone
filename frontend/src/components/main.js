@@ -11,6 +11,7 @@ import Cart from "./Cart/Cart";
 import Purchased from "./Cart/Purchased";
 import CheckShop from "./Shop/CheckShop";
 import Shop from "./Shop/Shop";
+import ShowShop from "./Shop/ShowShop";
 import Search from "./Home/Search";
 import Favourites from "./Favourites/Favourites";
 import Cookies from "js-cookie";
@@ -47,6 +48,7 @@ const Main = () => {
         <Route path="/purchased" element={<Purchased />} />
         <Route path="/checkshop" element={<CheckShop />} />
         <Route path="/shop" element={<Shop />} />
+        <Route path="/showshop" element={<ShowShop />} />
         <Route path="/favourites" element={<Favourites />}></Route>
       </Routes>
     </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../Navbar/Navbar";
 import Cookies from "js-cookie";
 import { Navigate } from "react-router";
+import { useLocation } from "react-router-dom";
 
 const axios = require("axios");
 
@@ -16,49 +17,51 @@ export default function Update() {
   const [city, setCity] = useState("");
   const [country, setCountry] = useState("");
   const [submit, setSubmit] = useState(false);
-  const [userData, setUserData] = useState("");
+  // const [userData, setUserData] = useState("");
+  const location = useLocation();
+  const userData = location?.state;
+  console.log(userData);
 
   useEffect(() => {
-    async function getUserData() {
-      const response = await axios.get("http://localhost:3001/getuserdata", {
-        params: { user: Cookies.get("username") },
-      });
-      setUserData(response.data[0]);
+    if (userData) {
+      fillWithData();
     }
-    getUserData();
   }, []);
 
   const username = Cookies.get("username");
 
   const fileHandler = (event) => {
     setFile(event.target.files[0]);
-    console.log(file);
   };
 
   const update = () => {
-    const data = {
-      username: username,
-      name: name,
-      phone: phone,
-      gender: gender,
-      email: email,
-      birthday: birthday,
-      address: address,
-      city: city,
-      country: country,
-    };
+    var bodyFormData = new FormData();
+    bodyFormData.append("file", file);
+    bodyFormData.append("username", username);
+    bodyFormData.append("name", name);
+    bodyFormData.append("phone", phone);
+    bodyFormData.append("gender", gender);
+    bodyFormData.append("email", email);
+    bodyFormData.append("birthday", birthday);
+    bodyFormData.append("address", address);
+    bodyFormData.append("city", city);
+    bodyFormData.append("country", country);
+
     //set the with credentials to true
     axios.defaults.withCredentials = true;
     //make a post request with the user data
-    axios.post("http://127.0.0.1:3001/userupdate", data).then((response) => {
-      if (response.data === "SUCCESS") {
-        console.log("Status Code : ", response.status);
-        setSubmit(true);
-      }
-      if (response.data === "UNSUCCESS") {
-        console.log(response.data);
-      }
-    });
+    axios
+      .post("http://127.0.0.1:3001/userupdate", bodyFormData)
+      .then((response) => {
+        console.log(response);
+        if (response.data === "SUCCESS") {
+          console.log("Status Code : ", response.status);
+          setSubmit(true);
+        }
+        if (response.data === "UNSUCCESS") {
+          console.log(response.data);
+        }
+      });
   };
 
   const fillWithData = () => {
@@ -66,18 +69,14 @@ export default function Update() {
     setPhone(userData.phone);
     setGender(userData.gender);
     setEmail(userData.email);
-    setBirthday(userData.birthday.slice(0, 10));
+    if (userData.birthday != null) {
+      setBirthday(userData.birthday.slice(0, 10));
+    }
+
     setAddress(userData.address);
     setCity(userData.city);
     setCountry(userData.country);
   };
-
-  // const timeout = () => {
-  //   setTimeout(() => {
-  //     console.log("time");
-
-  //   }, 10);
-  // };
 
   return (
     <>
@@ -546,21 +545,10 @@ export default function Update() {
                     className="btn btn-light action-button default-button"
                     role="button"
                     href="#"
+                    type="submit"
                     onClick={update}
                   >
                     Update
-                  </a>
-                </div>
-              </div>
-              <div className="row profile-row justify-content-center mt-2">
-                <div className="col-md-4">
-                  <a
-                    className="btn btn-light action-button default-button"
-                    role="button"
-                    href="#"
-                    onClick={fillWithData}
-                  >
-                    Fill Old Data
                   </a>
                 </div>
               </div>
