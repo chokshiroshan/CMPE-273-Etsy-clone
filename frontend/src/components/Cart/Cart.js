@@ -6,6 +6,7 @@ import Redirect from "../Redirect/Redirect";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { serverUrl } from "./serverurl";
 
 export default function Cart() {
   const [items, setItems] = useState([]);
@@ -15,7 +16,7 @@ export default function Cart() {
 
   useEffect(() => {
     async function getCart() {
-      const response = await axios.get("http://localhost:3001/getcart", {
+      const response = await axios.get(serverUrl + "/getcart", {
         params: { user: Cookies.get("username") },
       });
       if (response.data != "EMPTY") {
@@ -29,7 +30,7 @@ export default function Cart() {
   }, [item]);
   useEffect(() => {
     async function getTotal() {
-      const response = await axios.get("http://localhost:3001/getcarttotal", {
+      const response = await axios.get(serverUrl + "/getcarttotal", {
         params: { user: Cookies.get("username") },
       });
       if (response.data != "EMPTY") {
@@ -47,7 +48,7 @@ export default function Cart() {
       items: items,
       user: Cookies.get("username"),
     };
-    axios.post("http://127.0.0.1:3001/addpurchased", data).then((response) => {
+    axios.post(serverUrl + "/addpurchased", data).then((response) => {
       if (response.data === "SUCCESS") {
         console.log("Status Code : ", response.status);
       }

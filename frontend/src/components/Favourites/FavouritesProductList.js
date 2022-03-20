@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { serverUrl } from "./serverurl";
 
 export default function FavouritesProductList() {
   const [items, setItems] = useState([[]]);
@@ -11,7 +12,7 @@ export default function FavouritesProductList() {
 
   useEffect(() => {
     async function getFavourites() {
-      const response = await axios.get("http://localhost:3001/getfavourites", {
+      const response = await axios.get(serverUrl + "/getfavourites", {
         params: { user: Cookies.get("username") },
       });
       if (response.data != "EMPTY") {
@@ -25,7 +26,7 @@ export default function FavouritesProductList() {
   }, [remove]);
 
   const removefavourite = (item) => {
-    axios.delete("http://localhost:3001/removefavourite", {
+    axios.delete(serverUrl + "/removefavourite", {
       data: { id: item.id, username: Cookies.get("username") },
     });
     setRemove(item);

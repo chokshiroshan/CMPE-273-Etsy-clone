@@ -4,6 +4,7 @@ import Error from "../Error/Error";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { Navigate } from "react-router";
+import { serverUrl } from "./serverurl";
 
 export default function SignIn() {
   const [username, setUsername] = useState("");
@@ -21,7 +22,7 @@ export default function SignIn() {
     //set the with credentials to true
     axios.defaults.withCredentials = true;
     //make a post request with the user data
-    axios.post("http://127.0.0.1:3001/login", data).then((response) => {
+    axios.post(serverUrl + "/login", data).then((response) => {
       if (response.data === "SUCCESS") {
         setAuth(true);
         console.log("Status Code : ", response.status);

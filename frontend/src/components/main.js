@@ -16,13 +16,14 @@ import Search from "./Home/Search";
 import Favourites from "./Favourites/Favourites";
 import Cookies from "js-cookie";
 import axios from "axios";
+import { serverUrl } from "./serverurl";
 
 //Create a Main Component
 const Main = () => {
   const [userData, setUserData] = useState([]);
   useEffect(() => {
     async function getUserData() {
-      const response = await axios.get("http://localhost:3001/getuserdata", {
+      const response = await axios.get(serverUrl + "/getuserdata", {
         params: { user: Cookies.get("username") },
       });
       setUserData(response.data[0]);

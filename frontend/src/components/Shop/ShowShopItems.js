@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { Link } from "react-router-dom";
+import { serverUrl } from "../serverurl";
 
 export default function ShowShopItems(props) {
   const [items, setItems] = useState([[]]);
@@ -14,7 +15,7 @@ export default function ShowShopItems(props) {
 
   useEffect(() => {
     async function getItems() {
-      const response = await axios.get("http://localhost:3001/getitems", {
+      const response = await axios.get(serverUrl + "/getitems", {
         params: { shop: myshop },
       });
       setItems(response.data);

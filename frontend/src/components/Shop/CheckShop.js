@@ -4,6 +4,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { Navigate } from "react-router";
 import Error from "../Error/Error";
+import { serverUrl } from "./serverurl";
 
 export default function CheckShop() {
   const [shop, setShop] = useState("");
@@ -15,7 +16,7 @@ export default function CheckShop() {
       shop: shop,
       username: Cookies.get("username"),
     };
-    axios.post("http://127.0.0.1:3001/checkshop", data).then((response) => {
+    axios.post(serverUrl + "/checkshop", data).then((response) => {
       if (response.data === "SUCCESS") {
         setRedirect(true);
         console.log("ok");

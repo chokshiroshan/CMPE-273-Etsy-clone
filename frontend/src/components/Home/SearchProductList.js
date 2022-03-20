@@ -5,6 +5,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import Success from "../Success/Success";
 import Error from "../Error/Error";
+import { serverUrl } from "./serverurl";
 
 export default function SearchProductList({ items }) {
   const [favourites, setFavourites] = useState(0);
@@ -14,7 +15,7 @@ export default function SearchProductList({ items }) {
       id: id,
       user: Cookies.get("username"),
     };
-    axios.post("http://127.0.0.1:3001/addfavourites", data).then((response) => {
+    axios.post(serverUrl + "/addfavourites", data).then((response) => {
       if (response.data === "SUCCESS") {
         console.log("Status Code : ", response.status);
         setFavourites(1);

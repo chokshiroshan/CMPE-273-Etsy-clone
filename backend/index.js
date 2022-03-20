@@ -9,8 +9,10 @@ const fs = require("fs");
 const app = express();
 
 const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
+  host: "lab.cefcx53xhcnl.us-east-1.rds.amazonaws.com",
+  user: "admin",
+  password: "adminadmin",
+  port: 3306,
   database: "lab",
 });
 
@@ -38,7 +40,7 @@ const upload = multer({ storage: fileStorageEngine });
 app.use(express.static("public"));
 app.use("/images", express.static("images"));
 
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(cors({ origin: "http://100.26.104.195:3000", credentials: true }));
 
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
@@ -111,6 +113,7 @@ app.post("/register", function (request, response) {
       [username, password, email],
       function (error, results, fields) {
         // If there is an issue with the query, output the error
+        console.log(error);
 
         console.log(results);
         // If the account exists

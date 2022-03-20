@@ -3,6 +3,7 @@ import Navbar from "../Navbar/Navbar";
 import Cookies from "js-cookie";
 import { Navigate } from "react-router";
 import { useLocation } from "react-router-dom";
+import { serverUrl } from "./serverurl";
 
 const axios = require("axios");
 
@@ -50,18 +51,16 @@ export default function Update() {
     //set the with credentials to true
     axios.defaults.withCredentials = true;
     //make a post request with the user data
-    axios
-      .post("http://127.0.0.1:3001/userupdate", bodyFormData)
-      .then((response) => {
-        console.log(response);
-        if (response.data === "SUCCESS") {
-          console.log("Status Code : ", response.status);
-          setSubmit(true);
-        }
-        if (response.data === "UNSUCCESS") {
-          console.log(response.data);
-        }
-      });
+    axios.post(serverUrl + "/userupdate", bodyFormData).then((response) => {
+      console.log(response);
+      if (response.data === "SUCCESS") {
+        console.log("Status Code : ", response.status);
+        setSubmit(true);
+      }
+      if (response.data === "UNSUCCESS") {
+        console.log(response.data);
+      }
+    });
   };
 
   const fillWithData = () => {

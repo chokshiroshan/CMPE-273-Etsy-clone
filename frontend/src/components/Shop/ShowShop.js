@@ -4,6 +4,8 @@ import Redirect from "../Redirect/Redirect";
 import { useLocation } from "react-router";
 import ShowShopItems from "./ShowShopItems";
 import axios from "axios";
+import Footer from "../Footer/Footer";
+import { serverUrl } from "./serverurl";
 
 export default function ShowShop() {
   const location = useLocation();
@@ -11,7 +13,7 @@ export default function ShowShop() {
   const [owner, setOwner] = useState("");
   useEffect(() => {
     async function getOwner() {
-      const response = await axios.get("http://localhost:3001/getshopowner", {
+      const response = await axios.get(serverUrl + "/getshopowner", {
         params: { shop: shop },
       });
       setOwner(response.data[0]);
@@ -47,6 +49,7 @@ export default function ShowShop() {
           </div>
         </div>
       </div>
+      <Footer />
     </>
   );
 }

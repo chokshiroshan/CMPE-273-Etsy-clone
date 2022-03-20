@@ -4,6 +4,7 @@ import ProductList from "../Home/ProductList";
 import { Link } from "react-router-dom";
 import Redirect from "../Redirect/Redirect";
 import FavouritesProductList from "./FavouritesProductList";
+import Footer from "../Footer/Footer";
 
 export default function Favourites() {
   return (
@@ -39,6 +40,7 @@ export default function Favourites() {
           <FavouritesProductList />
         </div>
       </div>
+      <Footer />
     </>
   );
 }

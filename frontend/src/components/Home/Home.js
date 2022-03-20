@@ -6,6 +6,8 @@ import { useSearchParams } from "react-router-dom";
 import SearchProductList from "./SearchProductList";
 import Search from "./Search";
 import axios from "axios";
+import Footer from "../Footer/Footer";
+import { serverUrl } from "./serverurl";
 
 export default function Home({ userData }) {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -15,7 +17,7 @@ export default function Home({ userData }) {
   let search = searchParams.get("search");
   useEffect(() => {
     async function getItems() {
-      const response = await axios.get("http://localhost:3001/getsearchitems", {
+      const response = await axios.get(serverUrl + "/getsearchitems", {
         params: { keyword: search, filter: filter },
       });
       setItems(response.data);
@@ -83,6 +85,7 @@ export default function Home({ userData }) {
           )}
         </div>
       </div>
+      <Footer />
     </>
   );
 }

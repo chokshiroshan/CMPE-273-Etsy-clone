@@ -5,23 +5,16 @@ import { Link } from "react-router-dom";
 import Redirect from "../Redirect/Redirect";
 import Cookies from "js-cookie";
 const axios = require("axios");
+import { serverUrl } from "./serverurl";
 
 export default function Profile() {
   const [userData, setUserData] = useState("");
 
   let shop;
-  // useEffect(() => {
-  //   axios
-  //     .get("http://localhost:3001/getuserdata", {
-  //       params: { user: Cookies.get("username") },
-  //     })
-  //     .then(function (response) {
-  //       setUserData(response.data[0]);
-  //     });
-  // }, []);
+
   useEffect(() => {
     async function getUserData() {
-      const response = await axios.get("http://localhost:3001/getuserdata", {
+      const response = await axios.get(serverUrl + "/getuserdata", {
         params: { user: Cookies.get("username") },
       });
       setUserData(response.data[0]);

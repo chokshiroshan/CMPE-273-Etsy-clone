@@ -5,6 +5,7 @@ import axios from "axios";
 import Success from "../Success/Success";
 import Error from "../Error/Error";
 import Cookies from "js-cookie";
+import { serverUrl } from "./serverurl";
 
 export default function ProductList() {
   const [items, setItems] = useState([[]]);
@@ -15,7 +16,7 @@ export default function ProductList() {
       id: id,
       user: Cookies.get("username"),
     };
-    axios.post("http://127.0.0.1:3001/addfavourites", data).then((response) => {
+    axios.post(serverUrl + "/addfavourites", data).then((response) => {
       if (response.data === "SUCCESS") {
         console.log("Status Code : ", response.status);
         setFavourites(1);
@@ -28,7 +29,7 @@ export default function ProductList() {
   };
   useEffect(() => {
     async function getItems() {
-      const response = await axios.get("http://localhost:3001/getallitems");
+      const response = await axios.get(serverUrl + "/getallitems");
       setItems(response.data);
     }
     getItems();

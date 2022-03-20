@@ -2,6 +2,7 @@ import React from "react";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { serverUrl } from "./serverurl";
 
 export default function ShopItems(props) {
   const [items, setItems] = useState([[]]);
@@ -22,7 +23,7 @@ export default function ShopItems(props) {
   };
 
   const deleteItem = (item) => {
-    axios.delete("http://localhost:3001/deleteitem", {
+    axios.delete(serverUrl + "/deleteitem", {
       data: { id: item.id },
     });
     props.setForce(!props.force);
@@ -46,21 +47,19 @@ export default function ShopItems(props) {
     //set the with credentials to true
     axios.defaults.withCredentials = true;
     //make a post request with the user data
-    axios
-      .post("http://127.0.0.1:3001/edititem", bodyFormData)
-      .then((response) => {
-        if (response.data === "SUCCESS") {
-          console.log("Status Code : ", response.status);
-          setEdit(false);
-        }
-        if (response.data === "UNSUCCESS") {
-          console.log(response.data);
-        }
-      });
+    axios.post(serverUrl + "/edititem", bodyFormData).then((response) => {
+      if (response.data === "SUCCESS") {
+        console.log("Status Code : ", response.status);
+        setEdit(false);
+      }
+      if (response.data === "UNSUCCESS") {
+        console.log(response.data);
+      }
+    });
   };
   useEffect(() => {
     async function getItems() {
-      const response = await axios.get("http://localhost:3001/getitems", {
+      const response = await axios.get(serverUrl + "/getitems", {
         params: { shop: myshop },
       });
       setItems(response.data);

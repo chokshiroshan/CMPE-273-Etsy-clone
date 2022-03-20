@@ -5,6 +5,7 @@ import Error from "../Error/Error";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { Navigate } from "react-router";
+import { serverUrl } from "./serverurl";
 
 export default function Register() {
   const [username, setUsername] = useState("");
@@ -25,7 +26,7 @@ export default function Register() {
     //set the with credentials to true
     axios.defaults.withCredentials = true;
     //make a post request with the user data
-    axios.post("http://127.0.0.1:3001/register", data).then((response) => {
+    axios.post(serverUrl + "/register", data).then((response) => {
       setSubmit(true);
       if (response.data === "SUCCESS") {
         console.log("Status Code : ", response.status);
@@ -50,7 +51,7 @@ export default function Register() {
         </label>
         <input
           type="email"
-          id="inputEmail"
+          id="inputUsername"
           className="form-control"
           placeholder="Username"
           name="username"

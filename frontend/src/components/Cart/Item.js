@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { serverUrl } from "./serverurl";
 
 export default function Item({ item, setItem, history }) {
   const [items, setItems] = useState([[]]);
@@ -11,7 +12,7 @@ export default function Item({ item, setItem, history }) {
   useEffect(() => {
     if (history) {
       async function getPurchased() {
-        const response = await axios.get("http://localhost:3001/getpurchased", {
+        const response = await axios.get(serverUrl + "/getpurchased", {
           params: { user: Cookies.get("username") },
         });
         if (response.data != "EMPTY") {
@@ -23,7 +24,7 @@ export default function Item({ item, setItem, history }) {
       getPurchased();
     } else {
       async function getCart() {
-        const response = await axios.get("http://localhost:3001/getcart", {
+        const response = await axios.get(serverUrl + "/getcart", {
           params: { user: Cookies.get("username") },
         });
         if (response.data != "EMPTY") {
@@ -38,7 +39,7 @@ export default function Item({ item, setItem, history }) {
   }, [item]);
 
   const deleteItem = (item) => {
-    axios.delete("http://localhost:3001/deletecartitem", {
+    axios.delete(serverUrl + "/deletecartitem", {
       data: {
         id: item.id,
         user: Cookies.get("username"),

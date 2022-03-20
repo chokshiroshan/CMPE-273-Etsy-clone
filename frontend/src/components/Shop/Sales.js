@@ -1,12 +1,13 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { serverUrl } from "./serverurl";
 
 export default function Sales({ shop }) {
   const [items, setItems] = useState([[]]);
   useEffect(() => {
     async function getItems() {
-      const response = await axios.get("http://localhost:3001/getitems", {
+      const response = await axios.get(serverUrl + "/getitems", {
         params: { shop: shop },
       });
       setItems(response.data);

@@ -7,6 +7,8 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import ShopItems from "./ShopItems";
 import Sales from "./Sales";
+import Footer from "../Footer/Footer";
+import { serverUrl } from "./serverurl";
 
 export default function Shop() {
   const [add, setAdd] = useState(false);
@@ -25,7 +27,7 @@ export default function Shop() {
 
   useEffect(() => {
     async function getUserData() {
-      const response = await axios.get("http://localhost:3001/getuserdata", {
+      const response = await axios.get(serverUrl + "/getuserdata", {
         params: { user: Cookies.get("username") },
       });
       setUserData(response.data[0]);
@@ -55,17 +57,15 @@ export default function Shop() {
     //set the with credentials to true
     axios.defaults.withCredentials = true;
     //make a post request with the user data
-    axios
-      .post("http://127.0.0.1:3001/shopimage", bodyFormData)
-      .then((response) => {
-        if (response.data === "SUCCESS") {
-          console.log("Status Code : ", response.status);
-          setForce(!force);
-        }
-        if (response.data === "UNSUCCESS") {
-          console.log(response.data);
-        }
-      });
+    axios.post(serverUrl + "/shopimage", bodyFormData).then((response) => {
+      if (response.data === "SUCCESS") {
+        console.log("Status Code : ", response.status);
+        setForce(!force);
+      }
+      if (response.data === "UNSUCCESS") {
+        console.log(response.data);
+      }
+    });
   };
 
   const additem = () => {
@@ -269,6 +269,7 @@ export default function Shop() {
           )}
         </div>
       </div>
+      <Footer />
     </>
   );
 }

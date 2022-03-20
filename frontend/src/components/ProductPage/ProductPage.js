@@ -6,6 +6,8 @@ import Success from "../Success/Success";
 import Error from "../Error/Error";
 import Cookies from "js-cookie";
 import axios from "axios";
+import Footer from "../Footer/Footer";
+import { serverUrl } from "./serverurl";
 
 export default function ProductPage() {
   const location = useLocation();
@@ -20,7 +22,7 @@ export default function ProductPage() {
       id: item.id,
       user: Cookies.get("username"),
     };
-    axios.post("http://127.0.0.1:3001/addfavourites", data).then((response) => {
+    axios.post(serverUrl + "/addfavourites", data).then((response) => {
       if (response.data === "SUCCESS") {
         console.log("Status Code : ", response.status);
         setFavourites(1);
@@ -39,7 +41,7 @@ export default function ProductPage() {
       quantity: quantity,
       rquantity: item.quantity - quantity,
     };
-    axios.post("http://127.0.0.1:3001/addcart", data).then((response) => {
+    axios.post(serverUrl + "/addcart", data).then((response) => {
       if (response.data === "SUCCESS") {
         console.log("Status Code : ", response.status);
         setCart(1);
@@ -126,6 +128,7 @@ export default function ProductPage() {
           </div>
         </div>
       </div>
+      <Footer />
     </>
   );
 }
