@@ -13,6 +13,7 @@ export default function Shop() {
 
   const [userData, setUserData] = useState([]);
   const [addImage, setAddImage] = useState("");
+  const [addShopImage, setAddShopImage] = useState("");
   const [addName, setAddName] = useState("");
   const [addCategory, setAddCategory] = useState("");
   const [addDescription, setAddDescription] = useState("");
@@ -31,8 +32,8 @@ export default function Shop() {
     }
 
     getUserData();
-    console.log(userData.name);
-  }, []);
+    console.log(userData.shopimage);
+  }, [force]);
 
   const toggleAdd = () => {
     setAdd(!add);
@@ -40,6 +41,31 @@ export default function Shop() {
 
   const fileHandler = (event) => {
     setAddImage(event.target.files[0]);
+  };
+
+  const fileHandlerShop = (event) => {
+    setAddShopImage(event.target.files[0]);
+  };
+
+  const shopimage = () => {
+    var bodyFormData = new FormData();
+    bodyFormData.append("file", addShopImage);
+    bodyFormData.append("shop", shop);
+
+    //set the with credentials to true
+    axios.defaults.withCredentials = true;
+    //make a post request with the user data
+    axios
+      .post("http://127.0.0.1:3001/shopimage", bodyFormData)
+      .then((response) => {
+        if (response.data === "SUCCESS") {
+          console.log("Status Code : ", response.status);
+          setForce(!force);
+        }
+        if (response.data === "UNSUCCESS") {
+          console.log(response.data);
+        }
+      });
   };
 
   const additem = () => {
@@ -82,7 +108,27 @@ export default function Shop() {
       <div className="container">
         <div className="row" style={{ borderBottom: "1px solid" }}>
           <div className="col col-md-2">
-            <img />
+            <div className="row">
+              <img src={userData.shopimage} />
+              <div className="col-md-12">
+                <div className="avatar">
+                  <div className="avatar-bg center"></div>
+                </div>
+                <input
+                  className="form-control"
+                  type="file"
+                  name="file"
+                  onChange={fileHandlerShop}
+                />
+                <a
+                  className="btn default-button mt-3"
+                  role="button"
+                  onClick={shopimage}
+                >
+                  Image Upload
+                </a>
+              </div>
+            </div>
           </div>
           <div className="col col-md-3">
             <h1>{userData.shop}</h1>

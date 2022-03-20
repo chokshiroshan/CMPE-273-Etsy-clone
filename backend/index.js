@@ -19,6 +19,8 @@ const fileStorageEngine = multer.diskStorage({
     console.log(req);
     if (req.path == "/userupdate") {
       cb(null, "./public/images/users");
+    } else if (req.path == "/shopimage") {
+      cb(null, "./public/images/shops");
     } else {
       cb(null, "./public/images/items");
     }
@@ -243,6 +245,45 @@ app.post("/checkshop", function (request, response) {
   }
 });
 
+app.post("/shopimage", upload.single("file"), function (request, response) {
+  // Capture the input fields
+  console.log(request.body);
+  // Ensure the input fields exists and are not empty
+  image = "public/images/shops/" + request.body.shop + ".jpeg";
+  fs.rename("public/images/shops/file.jpeg", image, function (err) {
+    if (err) {
+      console.log(err);
+    }
+    console.log("File Renamed.");
+  });
+  // console.log(file);
+  image = "http://127.0.0.1:3001/images/shops/" + request.body.shop + ".jpeg";
+  // Execute SQL query that'll select the account from the database based on the specified username and password
+  db.query(
+    "UPDATE `users` SET `shopimage`=? WHERE `shop` = ?",
+    [image, request.body.shop],
+    function (error, results, fields) {
+      // If there is an issue with the query, output the error
+
+      console.log(results);
+      // If the account exists
+      if (error) {
+        throw error;
+      }
+      if (results) {
+        response.writeHead(200, {
+          "Content-Type": "text/plain",
+        });
+
+        console.log("Item Created");
+        response.end("SUCCESS");
+      }
+      console.log(results);
+      response.end("UNSUCCESS");
+    }
+  );
+});
+
 app.post("/additem", upload.single("file"), function (request, response) {
   // Capture the input fields
   console.log(request.body);
@@ -370,7 +411,7 @@ app.get("/getitems", function (request, response) {
 app.get("/getshopowner", function (request, response) {
   let shop = request.query.shop;
   db.query(
-    "SELECT `name`,`email`,`phone` FROM `users` WHERE `shop` = ?",
+    "SELECT `name`,`email`,`phone`,`shopimage` FROM `users` WHERE `shop` = ?",
     [shop],
     function (err, rows, fields) {
       if (err) {

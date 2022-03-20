@@ -25,7 +25,7 @@ export default function ShowShop() {
       <div className="container">
         <div className="row" style={{ borderBottom: "1px solid" }}>
           <div className="col col-md-2">
-            <img />
+            <img src={owner.shopimage} width="150" />
           </div>
           <div className="col col-md-3">
             <h1>{shop}</h1>
