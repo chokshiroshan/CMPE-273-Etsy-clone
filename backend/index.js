@@ -8,11 +8,17 @@ const fs = require("fs");
 
 const app = express();
 
+// const db = mysql.createConnection({
+//   host: "lab.cefcx53xhcnl.us-east-1.rds.amazonaws.com",
+//   user: "admin",
+//   password: "adminadmin",
+//   port: 3306,
+//   database: "lab",
+// });
+
 const db = mysql.createConnection({
-  host: "lab.cefcx53xhcnl.us-east-1.rds.amazonaws.com",
-  user: "admin",
-  password: "adminadmin",
-  port: 3306,
+  host: "localhost",
+  user: "root",
   database: "lab",
 });
 
@@ -40,7 +46,7 @@ const upload = multer({ storage: fileStorageEngine });
 app.use(express.static("public"));
 app.use("/images", express.static("images"));
 
-app.use(cors({ origin: "http://100.26.104.195:3000", credentials: true }));
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
@@ -169,7 +175,7 @@ app.post("/userupdate", upload.single("file"), function (request, response) {
     console.log("File Renamed.");
   });
   // console.log(file);
-  image = "http://100.26.104.195:3001/images/users/" + username + ".jpeg";
+  image = "http://localhost:3001/images/users/" + username + ".jpeg";
   if (username) {
     db.query(
       "UPDATE `users` SET `image`=?,`name`=?,`email`=?,`phone`=?,`gender`=?,`birthday`=?,`address`=?,`city`=?,`country`=? WHERE `username` = ?",
@@ -260,8 +266,7 @@ app.post("/shopimage", upload.single("file"), function (request, response) {
     console.log("File Renamed.");
   });
   // console.log(file);
-  image =
-    "http://100.26.104.195:3001/images/shops/" + request.body.shop + ".jpeg";
+  image = "http://localhost:3001/images/shops/" + request.body.shop + ".jpeg";
   // Execute SQL query that'll select the account from the database based on the specified username and password
   db.query(
     "UPDATE `users` SET `shopimage`=? WHERE `shop` = ?",
@@ -300,8 +305,7 @@ app.post("/additem", upload.single("file"), function (request, response) {
     console.log("File Renamed.");
   });
   // console.log(file);
-  image =
-    "http://100.26.104.195:3001/images/items/" + request.body.name + ".jpeg";
+  image = "http://localhost:3001/images/items/" + request.body.name + ".jpeg";
   // Execute SQL query that'll select the account from the database based on the specified username and password
   db.query(
     "INSERT INTO `items`(`image`,`name`, `category`, `price`, `description`, `quantity`, `shop`) VALUES (?,?,?,?,?,?,?)",
@@ -339,8 +343,7 @@ app.post("/additem", upload.single("file"), function (request, response) {
 app.post("/edititem", upload.single("file"), function (request, response) {
   // Capture the input fields
   console.log("body: ", request.body);
-  image =
-    "http://100.26.104.195:3001/images/items/" + request.body.name + ".jpeg";
+  image = "http://localhost:3001/images/items/" + request.body.name + ".jpeg";
   fs.rename("public/images/items/file.jpeg", image, function (err) {
     if (err) {
       console.log(err);

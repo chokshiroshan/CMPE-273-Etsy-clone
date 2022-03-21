@@ -80,7 +80,7 @@ export default function Update() {
   return (
     <>
       {submit ? <Navigate to="/profile" /> : ""}
-      <Navbar />
+      {/* <Navbar /> */}
       <h1 className="offset-1">Edit Profile</h1>
       <div className="container profile profile-view" id="profile">
         <div className="row">
@@ -192,6 +192,7 @@ export default function Update() {
                   <textarea
                     className="form-control"
                     value={address}
+                    data-testid="address"
                     onChange={(e) => setAddress(e.target.value)}
                   ></textarea>
                 </div>
