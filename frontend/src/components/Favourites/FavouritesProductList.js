@@ -41,7 +41,7 @@ export default function FavouritesProductList() {
           {items.map((item) => (
             <div className="col-md-3">
               <div className="card">
-                <img className="card-img-top w-100 d-block" />
+                <img className="card-img-top w-100 d-block" src={item.image} />
                 <div className="card-body">
                   <h4 className="card-title">{item.name}</h4>
                   <p className="card-text">{item.description}</p>
