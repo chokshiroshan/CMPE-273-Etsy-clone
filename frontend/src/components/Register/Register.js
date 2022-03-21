@@ -45,7 +45,7 @@ export default function Register() {
       {redirect ? <Navigate to={"/"} /> : ""}
       <Navbar loggedin={false} />
       <form className="form-signin">
-        <h1 className="h3 mb-3 font-weight-normal">Please sign in</h1>
+        <h1 className="h3 mb-3 font-weight-normal">Register</h1>
         <label htmlFor="inputUsername" className="sr-only">
           Username
         </label>
