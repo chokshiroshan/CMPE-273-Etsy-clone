@@ -114,7 +114,9 @@ export default function Cart() {
                 <ul className="list-unstyled mb-4">
                   <li className="d-flex justify-content-between py-3 border-bottom">
                     <strong className="text-muted">Total</strong>
-                    <h5 className="font-weight-bold">${total}</h5>
+                    <h5 className="font-weight-bold">
+                      ${parseFloat(total).toFixed(2)}
+                    </h5>
                   </li>
                 </ul>
 
