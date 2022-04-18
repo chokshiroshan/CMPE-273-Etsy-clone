@@ -16,10 +16,13 @@ const app = express();
 //   database: "lab",
 // });
 
+// UmvC3mJSugPc7u95;
+
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
   database: "lab",
+  password: "admin",
 });
 
 const fileStorageEngine = multer.diskStorage({
