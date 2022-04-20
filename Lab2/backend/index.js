@@ -5,24 +5,21 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const multer = require("multer");
 const fs = require("fs");
-
+const mongoose = require("mongoose");
 const app = express();
+const users = require("./models/Users");
+const items = require("./models/Items");
+const favourites = require("./models/Favourites");
+const cart = require("./models/Cart");
+const purchased = require("./models/Purchased");
 
-// const db = mysql.createConnection({
-//   host: "lab.cefcx53xhcnl.us-east-1.rds.amazonaws.com",
-//   user: "admin",
-//   password: "adminadmin",
-//   port: 3306,
-//   database: "lab",
-// });
+require("dotenv").config();
 
-// UmvC3mJSugPc7u95;
-
-const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  database: "lab",
-  password: "admin",
+const uri = process.env.ATLAS_URI;
+mongoose.connect(uri);
+const db = mongoose.connection;
+db.once("open", () => {
+  console.log("MongoDB database connection established successfully");
 });
 
 const fileStorageEngine = multer.diskStorage({
@@ -55,12 +52,6 @@ app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 // app.use(bodyParser.json());
 
-db.connect((err) => {
-  if (err) {
-    throw err;
-  }
-});
-
 app.use(
   session({
     secret: "secret",
@@ -71,37 +62,24 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.post("/login", function (request, response) {
+app.post("/login", async (request, response) => {
   // Capture the input fields
+  console.log("In Login");
   let username = request.body.username;
   let password = request.body.password;
   console.log(request.body);
   // Ensure the input fields exists and are not empty
   if (username && password) {
     // Execute SQL query that'll select the account from the database based on the specified username and password
-    db.query(
-      "SELECT * FROM users WHERE username = ? AND password = ?",
-      [username, password],
-      function (error, results, fields) {
-        // If there is an issue with the query, output the error
-        if (error) throw error;
-        // If the account exists
-        if (results.length > 0) {
-          // Authenticate the user
-          response.writeHead(200, {
-            "Content-Type": "text/plain",
-          });
-          // Redirect to home page
-          console.log("Correct");
-          response.end("SUCCESS");
-        } else {
-          console.log("Incorrect");
-
-          response.end("UNSUCCESS");
-        }
-        response.end();
-      }
-    );
+    const user = await users.find({ username: username, password: password });
+    if (user.length > 0) {
+      response.writeHead(200, {
+        "Content-Type": "text/plain",
+      });
+      response.end("SUCCESS");
+    } else {
+      response.end("UNSUCCESS");
+    }
   } else {
     response.send("Please enter Username and Password!");
     response.end();
@@ -117,35 +95,20 @@ app.post("/register", function (request, response) {
   // Ensure the input fields exists and are not empty
   if (username && password) {
     // Execute SQL query that'll select the account from the database based on the specified username and password
-    db.query(
-      "INSERT INTO `users`(`username`, `password`,`email`) VALUES (?,?,?)",
-      [username, password, email],
-      function (error, results, fields) {
-        // If there is an issue with the query, output the error
-        console.log(error);
-
-        console.log(results);
-        // If the account exists
-        if (error) {
-          if (error.errno == 1062) {
-            console.log("User not Created");
-
-            response.end("UNSUCCESS");
-          }
-        }
-
-        if (results) {
-          // Authenticate the user
-          response.writeHead(200, {
-            "Content-Type": "text/plain",
-          });
-          // Redirect to home page
-          console.log("User Created");
-          response.end("SUCCESS");
-        }
-        response.end();
+    users.find({ username: username }, function (err, user) {
+      if (user.length > 0) {
+        console.log("User not Created");
+        response.end("UNSUCCESS");
+      } else {
+        users.create({
+          username: username,
+          email: email,
+          password: password,
+        });
+        console.log("User Created");
+        response.end("SUCCESS");
       }
-    );
+    });
   } else {
     response.send("Please enter Username and Password!");
     response.end();
@@ -155,17 +118,14 @@ app.post("/register", function (request, response) {
 app.get("/getuserdata", function (request, response) {
   let user = request.query.user;
   console.log(user);
-  db.query(
-    "SELECT * FROM `users` WHERE `username` = ?",
-    [user],
-    function (err, rows, fields) {
-      if (err) {
-        throw err;
-      } else {
-        response.json(rows);
-      }
+
+  users.find({ username: user }, function (err, user) {
+    if (err) {
+      throw err;
+    } else {
+      response.json(user);
     }
-  );
+  });
 });
 
 app.post("/userupdate", upload.single("file"), function (request, response) {
@@ -180,25 +140,25 @@ app.post("/userupdate", upload.single("file"), function (request, response) {
   // console.log(file);
   image = "http://localhost:3001/images/users/" + username + ".jpeg";
   if (username) {
-    db.query(
-      "UPDATE `users` SET `image`=?,`name`=?,`email`=?,`phone`=?,`gender`=?,`birthday`=?,`address`=?,`city`=?,`country`=? WHERE `username` = ?",
-      [
-        image,
-        request.body.name,
-        request.body.email,
-        request.body.phone,
-        request.body.gender,
-        request.body.birthday,
-        request.body.address,
-        request.body.city,
-        request.body.country,
-        username,
-      ],
-      function (error, results, fields) {
-        // If there is an issue with the query, output the error
-        console.log(error);
-        if (results) {
-          // Authenticate the user
+    users.updateOne(
+      { username: username },
+      {
+        $set: {
+          image: image,
+          name: request.body.name,
+          email: request.body.email,
+          phone: request.body.phone,
+          gender: request.body.gender,
+          birthday: request.body.birthday,
+          address: request.body.address,
+          city: request.body.city,
+          country: request.body.country,
+        },
+      },
+      function (err, user) {
+        if (err) {
+          response.end("UNSUCCESS");
+        } else {
           response.writeHead(200, {
             "Content-Type": "text/plain",
           });
@@ -206,7 +166,6 @@ app.post("/userupdate", upload.single("file"), function (request, response) {
           console.log("User Updated");
           response.end("SUCCESS");
         }
-        response.end("UNSUCCESS");
       }
     );
   } else {
@@ -223,24 +182,16 @@ app.post("/checkshop", function (request, response) {
   // Ensure the input fields exists and are not empty
   if (shop) {
     // Execute SQL query that'll select the account from the database based on the specified username and password
-    db.query(
-      "UPDATE `users` SET `shop`=? WHERE `username` = ?",
-      [shop, username],
-      function (error, results, fields) {
-        // If there is an issue with the query, output the error
 
-        console.log(results);
-        // If the account exists
-        if (error) {
-          if (error.errno == 1062) {
-            console.log("User not Created");
+    users.updateOne(
+      { username: username },
+      { $set: { shop: shop } },
+      function (err) {
+        if (err) {
+          console.log("Shop not Created");
 
-            response.end("UNSUCCESS");
-          }
-        }
-
-        if (results) {
-          // Authenticate the user
+          response.end("UNSUCCESS");
+        } else {
           response.writeHead(200, {
             "Content-Type": "text/plain",
           });
@@ -248,7 +199,6 @@ app.post("/checkshop", function (request, response) {
           console.log("Shop Created");
           response.end("SUCCESS");
         }
-        response.end();
       }
     );
   } else {
@@ -271,29 +221,27 @@ app.post("/shopimage", upload.single("file"), function (request, response) {
   // console.log(file);
   image = "http://localhost:3001/images/shops/" + request.body.shop + ".jpeg";
   // Execute SQL query that'll select the account from the database based on the specified username and password
-  db.query(
-    "UPDATE `users` SET `shopimage`=? WHERE `shop` = ?",
-    [image, request.body.shop],
-    function (error, results, fields) {
-      // If there is an issue with the query, output the error
-
-      console.log(results);
-      // If the account exists
-      if (error) {
-        throw error;
+  if (request.body.shop) {
+    users.updateOne(
+      { shop: request.body.shop },
+      { $set: { shopimage: image } },
+      function (err) {
+        if (err) {
+          console.log("Shop Image not Updated");
+          response.end("UNSUCCESS");
+        } else {
+          response.writeHead(200, {
+            "Content-Type": "text/plain",
+          });
+          console.log("Shop Image Updated");
+          response.end("SUCCESS");
+        }
       }
-      if (results) {
-        response.writeHead(200, {
-          "Content-Type": "text/plain",
-        });
-
-        console.log("Item Created");
-        response.end("SUCCESS");
-      }
-      console.log(results);
-      response.end("UNSUCCESS");
-    }
-  );
+    );
+  } else {
+    response.send("Please enter Shop name!");
+    response.end();
+  }
 });
 
 app.post("/additem", upload.single("file"), function (request, response) {
@@ -310,37 +258,34 @@ app.post("/additem", upload.single("file"), function (request, response) {
   // console.log(file);
   image = "http://localhost:3001/images/items/" + request.body.name + ".jpeg";
   // Execute SQL query that'll select the account from the database based on the specified username and password
-  db.query(
-    "INSERT INTO `items`(`image`,`name`, `category`, `price`, `description`, `quantity`, `shop`) VALUES (?,?,?,?,?,?,?)",
-    [
-      image,
-      request.body.name,
-      request.body.category,
-      request.body.price,
-      request.body.description,
-      request.body.quantity,
-      request.body.shop,
-    ],
-    function (error, results, fields) {
-      // If there is an issue with the query, output the error
-
-      console.log(results);
-      // If the account exists
-      if (error) {
-        throw error;
+  if (request.body.name) {
+    items.create(
+      {
+        image: image,
+        name: request.body.name,
+        category: request.body.category,
+        price: request.body.price,
+        description: request.body.description,
+        quantity: request.body.quantity,
+        shop: request.body.shop,
+      },
+      function (err, item) {
+        if (err) {
+          console.log(err);
+          response.end("UNSUCCESS");
+        } else {
+          response.writeHead(200, {
+            "Content-Type": "text/plain",
+          });
+          console.log("Item Created");
+          response.end("SUCCESS");
+        }
       }
-      if (results) {
-        response.writeHead(200, {
-          "Content-Type": "text/plain",
-        });
-
-        console.log("Item Created");
-        response.end("SUCCESS");
-      }
-      console.log(results);
-      response.end("UNSUCCESS");
-    }
-  );
+    );
+  } else {
+    response.send("Please enter Item name!");
+    response.end();
+  }
 });
 
 app.post("/edititem", upload.single("file"), function (request, response) {
@@ -354,95 +299,76 @@ app.post("/edititem", upload.single("file"), function (request, response) {
     console.log("File Renamed.");
   });
 
-  db.query(
-    "UPDATE `items` SET `image`=?,`name`=?,`category`=?,`price`=?,`description`=?,`quantity`=? WHERE `shop` = ? AND `id` = ?",
-    [
-      image,
-      request.body.name,
-      request.body.category,
-      request.body.price,
-      request.body.description,
-      request.body.quantity,
-      request.body.shop,
-      request.body.id,
-    ],
-    function (error, results, fields) {
-      // If there is an issue with the query, output the error
-      if (error) {
-        throw error;
-      }
-      // If the account exists
-      if (results) {
-        // Authenticate the user
+  items.updateOne(
+    { $and: [{ _id: request.body.id }, { shop: request.body.shop }] },
+    {
+      $set: {
+        image: image,
+        name: request.body.name,
+        category: request.body.category,
+        price: request.body.price,
+        description: request.body.description,
+        quantity: request.body.quantity,
+        shop: request.body.shop,
+      },
+    },
+    function (err) {
+      if (err) {
+        console.log("Item Image not Updated");
+        response.end("UNSUCCESS");
+      } else {
         response.writeHead(200, {
           "Content-Type": "text/plain",
         });
-        // Redirect to home page
-        // console.log(results);
+        console.log("Item Image Updated");
         response.end("SUCCESS");
       }
-      response.end("UNSUCCESS");
     }
   );
 });
 
 app.delete("/deleteitem", function (req, res) {
   console.log(req.body);
-  db.query(
-    "DELETE FROM `items` WHERE `id`=?",
-    [req.body.id],
-    function (error, results, fields) {
-      if (error) throw error;
-      if (results) {
-        res.writeHead(200, {
-          "Content-Type": "text/plain",
-        });
-        res.end("SUCCESS");
-      }
-      res.end("UNSUCCESS");
+
+  items.deleteOne({ _id: req.body.id }, function (err) {
+    if (err) {
+      console.log("Item not Deleted");
+    } else {
+      console.log("Item Deleted");
     }
-  );
+  });
 });
 
 app.get("/getitems", function (request, response) {
   let shop = request.query.shop;
-  db.query(
-    "SELECT * FROM `items` WHERE `shop` = ?",
-    [shop],
-    function (err, rows, fields) {
-      if (err) {
-        throw err;
-      } else {
-        // console.log(rows);
-        response.json(rows);
-      }
+
+  items.find({ shop: shop }, function (err, items) {
+    if (err) {
+      console.log(err);
+    } else {
+      response.json(items);
     }
-  );
+  });
 });
 
 app.get("/getshopowner", function (request, response) {
   let shop = request.query.shop;
-  db.query(
-    "SELECT `name`,`email`,`phone`,`shopimage` FROM `users` WHERE `shop` = ?",
-    [shop],
-    function (err, rows, fields) {
-      if (err) {
-        throw err;
-      } else {
-        console.log(rows);
-        response.json(rows);
-      }
+
+  users.find({ shop: shop }, function (err, users) {
+    if (err) {
+      console.log(err);
+    } else {
+      response.json(users);
     }
-  );
+  });
 });
 
 app.get("/getallitems", function (request, response) {
-  db.query("SELECT * FROM `items`", function (err, rows, fields) {
+  items.find({}, function (err, items) {
     if (err) {
-      throw err;
+      console.log(err);
     } else {
-      console.log(rows);
-      response.json(rows);
+      response.json(items);
     }
   });
 });
@@ -450,50 +376,39 @@ app.get("/getallitems", function (request, response) {
 app.post("/addfavourites", function (request, response) {
   // Capture the input fields
   console.log(request.body);
-
-  db.query(
-    "INSERT INTO `favourites`(`id`, `user`) VALUES (?,?)",
-    [request.body.id, request.body.user],
-    function (error, results, fields) {
-      // If there is an issue with the query, output the error
-
-      console.log(results);
-      // If the account exists
-      if (error) {
-        if (error.errno == 1062) {
-          console.log("Aready Added to Favourites");
-
-          response.end("UNSUCCESS");
-        }
-      }
-      if (results) {
+  favourites.create(
+    { id: request.body.id, user: request.body.user },
+    function (err, item) {
+      if (err) {
+        console.log(err);
+        response.end("UNSUCCESS");
+      } else {
         response.writeHead(200, {
           "Content-Type": "text/plain",
         });
-
-        console.log("Added to Favourites");
+        console.log("Item Created");
         response.end("SUCCESS");
       }
-      console.log(results);
-      response.end("UNSUCCESS");
     }
   );
 });
 
 app.delete("/removefavourite", function (req, res) {
   console.log(req.body);
-  db.query(
-    "DELETE FROM `favourites` WHERE `id`=? AND `user`=?",
-    [req.body.id, req.body.username],
-    function (error, results, fields) {
-      if (error) throw error;
-      if (results) {
+
+  favourites.deleteOne(
+    { id: req.body.id, username: req.body.username },
+    function (err) {
+      if (err) {
+        console.log("Item not Deleted");
+        res.end("UNSUCCESS");
+      } else {
+        console.log("Item Deleted");
         res.writeHead(200, {
           "Content-Type": "text/plain",
         });
         res.end("SUCCESS");
       }
-      res.end("UNSUCCESS");
     }
   );
 });
@@ -502,37 +417,30 @@ app.get("/getfavourites", function (request, response) {
   // Capture the input fields
   console.log(request.query);
 
-  db.query(
-    "SELECT `id` FROM `favourites` WHERE `user` = ?",
-    [request.query.user],
-    function (err, rows, fields) {
-      if (err) {
-        throw err;
+  favourites.find({ user: request.query.user }, async (err, rows) => {
+    if (err) {
+      console.log(err);
+      response.end("EMPTY");
+    } else {
+      let array = [];
+      // console.log("rows: " + rows);
+      rows.map((row) => array.push(row.id));
+      // console.log("array: " + array);
+      if (array.length > 0) {
+        items.find({ _id: { $in: array } }, function (err, items) {
+          if (err) {
+            // console.log(err);
+            response.end("EMPTY");
+          } else {
+            // console.log("items: " + items);
+            response.json(items);
+          }
+        });
       } else {
-        // console.log(rows);
-        let array = [];
-        rows.map((row) => array.push(row.id));
-        // console.log("array: " + array);
-        if (array.length > 0) {
-          const query =
-            "SELECT * FROM `items` WHERE `id` in (?" +
-            ",?".repeat(array.length - 1) +
-            ")";
-          // console.log(query);
-          db.query(query, array, function (err, rows, fields) {
-            if (err) {
-              throw err;
-            } else {
-              // console.log(rows);
-              response.json(rows);
-            }
-          });
-        } else {
-          response.end("EMPTY");
-        }
+        response.end("EMPTY");
       }
     }
-  );
+  });
 });
 
 app.get("/getsearchitems", function (request, response) {
@@ -542,67 +450,64 @@ app.get("/getsearchitems", function (request, response) {
   // console.log(query);
   if (filter) {
     if (filter == 1) {
-      db.query(
-        "SELECT * FROM `items` WHERE `name` LIKE '%" +
-          request.query.keyword +
-          "%' AND `price` <50",
-        function (err, rows, fields) {
+      items.find(
+        {
+          $and: [
+            { name: { $regex: request.query.keyword } },
+            { price: { $lt: 50 } },
+          ],
+        },
+        function (err, items) {
           if (err) {
-            throw err;
+            console.log(err);
           } else {
-            console.log("filter");
-
-            console.log(rows);
-            response.json(rows);
+            response.json(items);
           }
         }
       );
     } else if (filter == 2) {
-      db.query(
-        "SELECT * FROM `items` WHERE `name` LIKE '%" +
-          request.query.keyword +
-          "%' AND `price` >50 AND `price`<100",
-        function (err, rows, fields) {
+      items.find(
+        {
+          $and: [
+            { name: { $regex: request.query.keyword } },
+            { $and: [{ price: { $gt: 50 } }, { price: { $lt: 100 } }] },
+          ],
+        },
+        function (err, items) {
           if (err) {
-            throw err;
+            console.log(err);
           } else {
-            console.log("filter");
-
-            console.log(rows);
-            response.json(rows);
+            response.json(items);
           }
         }
       );
     } else {
-      db.query(
-        "SELECT * FROM `items` WHERE `name` LIKE '%" +
-          request.query.keyword +
-          "%' AND `price` >100",
-        function (err, rows, fields) {
+      items.find(
+        {
+          $and: [
+            { name: { $regex: request.query.keyword } },
+            { price: { $gt: 100 } },
+          ],
+        },
+        function (err, items) {
           if (err) {
-            throw err;
+            console.log(err);
           } else {
-            console.log("filter");
-
-            console.log(rows);
-            response.json(rows);
+            response.json(items);
           }
         }
       );
     }
   } else {
-    db.query(
-      "SELECT * FROM `items` WHERE `name` LIKE '%" +
-        request.query.keyword +
-        "%'",
-      function (err, rows, fields) {
+    items.find(
+      { name: { $regex: request.query.keyword } },
+      function (err, items) {
         if (err) {
-          throw err;
+          console.log(err);
         } else {
           console.log("no filter");
-
-          console.log(rows);
-          response.json(rows);
+          console.log(items);
+          response.json(items);
         }
       }
     );
@@ -613,33 +518,34 @@ app.post("/addcart", function (request, response) {
   // Capture the input fields
   console.log(request.body);
 
-  db.query(
-    "INSERT INTO `cart`(`id`, `user`,`quantity`) VALUES (?,?,?)",
-    [request.body.id, request.body.user, request.body.quantity],
-    function (error, results, fields) {
-      // If there is an issue with the query, output the error
-      console.log(results);
-      // If the account exists
-      if (error) {
-        if (error.errno == 1062) {
-          console.log("Aready Added to Cart");
-
-          response.end("UNSUCCESS");
-        }
-      }
-      if (results) {
+  cart.create(
+    {
+      id: request.body.id,
+      user: request.body.user,
+      quantity: request.body.quantity,
+    },
+    function (err) {
+      if (err) {
+        console.log(err);
+        response.end("UNSUCCESS");
+      } else {
+        items.updateOne(
+          { _id: request.body.id },
+          { $set: { quantity: request.body.rquantity } },
+          function (err) {
+            if (err) {
+              console.log(err);
+            } else {
+              console.log("Item Updated");
+            }
+          }
+        );
         response.writeHead(200, {
           "Content-Type": "text/plain",
         });
-        db.query("UPDATE `items` SET `quantity`=? WHERE `id` =?", [
-          request.body.rquantity,
-          request.body.id,
-        ]);
-        console.log("Added to Cart");
+        console.log("Item Created");
         response.end("SUCCESS");
       }
-      console.log(results);
-      response.end("UNSUCCESS");
     }
   );
 });
@@ -648,140 +554,120 @@ app.get("/getcart", function (request, response) {
   // Capture the input fields
   // console.log(request.query);
 
-  db.query(
-    "SELECT `id`,`quantity` FROM `cart` WHERE `user` = ?",
-    [request.query.user],
-    function (err, rows, fields) {
-      if (err) {
-        throw err;
-      } else {
-        // console.log(rows);
-        let array = [];
-        let q = [];
-        rows.map((row) => array.push(row.id));
-        rows.map((row) => q.push(row.quantity));
-
-        // console.log("array: " + array);
-        if (array.length > 0) {
-          const query =
-            "SELECT * FROM `items` WHERE `id` in (?" +
-            ",?".repeat(array.length - 1) +
-            ")";
-          // console.log(query);
-          db.query(query, array, function (err, rows, fields) {
-            if (err) {
-              throw err;
-            } else {
-              rows.map((row, index) => (row.quantity = q[index]));
-              // console.log("items: " + rows);
-              response.json(rows);
-            }
-          });
-        } else {
-          response.end("EMPTY");
-        }
+  cart.find({ user: request.query.user }, function (err, rows) {
+    if (err) {
+      console.log(err);
+      response.end("EMPTY");
+    } else {
+      let array = [];
+      let q = [];
+      rows.map((row) => array.push(row.id));
+      rows.map((row) => q.push(row.quantity));
+      if (array.length > 0) {
+        items.find({ _id: { $in: array } }, function (err, items) {
+          if (err) {
+            console.log(err);
+          } else {
+            items.map((item, index) => (item.quantity = q[index]));
+            // console.log("items: " + items);
+            response.json(items);
+          }
+        });
       }
     }
-  );
+  });
 });
 
 app.delete("/deletecartitem", function (req, res) {
   console.log(req.body);
-  db.query(
-    "DELETE FROM `cart` WHERE `id`=? AND `user`=?",
-    [req.body.id, req.body.user],
-    function (error, results, fields) {
-      if (error) throw error;
-      if (results) {
-        res.writeHead(200, {
-          "Content-Type": "text/plain",
-        });
-        console.log(results);
-        db.query(
-          "UPDATE `items` SET `quantity`= `quantity` + ? WHERE `id` = ?",
-          [req.body.quantity, req.body.id]
-        );
-        res.end("SUCCESS");
-      }
-      res.end("UNSUCCESS");
+  cart.deleteOne({ id: req.body.id, user: req.body.user }, function (err) {
+    if (err) {
+      console.log(err);
+    } else {
+      items.updateOne(
+        { _id: req.body.id },
+        { $inc: { quantity: req.body.quantity } },
+        function (err) {
+          console.log(err);
+          console.log("Item Deleted");
+          res.writeHead(200, {
+            "Content-Type": "text/plain",
+          });
+          res.end("SUCCESS");
+        }
+      );
     }
-  );
+  });
 });
 
 app.get("/getcarttotal", function (request, response) {
   // Capture the input fields
   // console.log(request.query);
 
-  db.query(
-    "SELECT `id`,`quantity` FROM `cart` WHERE `user` = ?",
-    [request.query.user],
-    function (err, rows, fields) {
-      if (err) {
-        throw err;
-      } else {
-        // console.log(rows);
-        let array = [];
-        let quantity = [];
-
-        rows.map((row) => array.push(row.id));
-        rows.map((row) => quantity.push(row.quantity));
-
-        // console.log("array: " + array);
-        if (array.length > 0) {
-          const query =
-            "SELECT * FROM `items` WHERE `id` in (?" +
-            ",?".repeat(array.length - 1) +
-            ")";
-          // console.log(query);
-          db.query(query, array, function (err, rows, fields) {
-            if (err) {
-              throw err;
-            } else {
-              let q = 0;
-              rows.map((row, index) => (q = row.price * quantity[index] + q));
-              // console.log(q);
-              response.json(q);
-            }
-          });
-        } else {
-          response.end("EMPTY");
-        }
+  cart.find({ user: request.query.user }, function (err, rows) {
+    if (err) {
+      console.log(err);
+      response.end("EMPTY");
+    } else {
+      let array = [];
+      let quantity = [];
+      rows.map((row) => array.push(row.id));
+      rows.map((row) => quantity.push(row.quantity));
+      if (array.length > 0) {
+        items.find({ _id: { $in: array } }, function (err, items) {
+          if (err) {
+            console.log(err);
+          } else {
+            let q = 0;
+            items.map((item, index) => (q = item.price * quantity[index] + q));
+            // console.log("items: " + items);
+            response.json(q);
+          }
+        });
       }
     }
-  );
+  });
 });
 
 app.post("/addpurchased", function (request, response) {
-  const items = request.body.items;
-  items.map((item) => {
-    db.query(
-      "INSERT INTO `purchased`(`id`, `user`,`quantity`) VALUES (?,?,?)",
-      [item.id, request.body.user, item.quantity],
-      function (error, results, fields) {
-        if (error) {
-          throw error;
+  const i = request.body.items;
+  console.log(request.body);
+  i.map((item) => {
+    purchased.create(
+      {
+        id: item._id,
+        user: request.body.user,
+        quantity: item.quantity,
+      },
+      function (err) {
+        if (err) {
+          console.log(err);
+          response.end("UNSUCCESS");
+        } else {
+          console.log("Item Created");
+          response.end("SUCCESS");
         }
       }
     );
   });
-  items.map((item) => {
-    db.query(
-      "DELETE FROM `cart` WHERE `id`=? AND `user`=?",
-      [item.id, request.body.user],
-      function (error, results, fields) {
-        if (error) {
-          throw error;
-        }
+  i.map((item) => {
+    cart.deleteOne({ id: item._id, user: request.body.user }, function (err) {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Item Deleted");
       }
-    );
+    });
   });
-  items.map((item) => {
-    db.query(
-      "UPDATE `items` SET `sold`=`sold`+? WHERE `id` = ?",
-      [item.quantity, item.id],
-      function (error, results, fields) {
-        if (error) {
-          throw error;
+  i.map((item) => {
+    items.updateOne(
+      { _id: item._id },
+      { $inc: { sold: item.quantity } },
+      function (err) {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log("Item Updated");
         }
       }
     );
@@ -790,21 +676,25 @@ app.post("/addpurchased", function (request, response) {
 
 app.get("/getpurchased", function (request, response) {
   // Capture the input fields
-  // console.log(request.query);
-
-  db.query(
-    "SELECT items.name, items.category, items.price, items.image, purchased.quantity FROM purchased INNER JOIN items ON purchased.id=items.id and purchased.user = ?",
-    [request.query.user],
-    function (err, rows, fields) {
-      if (err) {
-        throw err;
-      }
-      if (rows) {
-        console.log(rows);
-        response.json(rows);
+  purchased.find({ user: request.query.user }, function (err, rows) {
+    if (err) {
+      console.log(err);
+      response.end("EMPTY");
+    } else {
+      let array = [];
+      rows.map((row) => array.push(row.id));
+      if (array.length > 0) {
+        items.find({ _id: { $in: array } }, function (err, items) {
+          if (err) {
+            console.log(err);
+          } else {
+            // console.log("items: " + items);
+            response.json(items);
+          }
+        });
       }
     }
-  );
+  });
 });
 
 app.listen("3001", () => {});
