@@ -12,6 +12,8 @@ export default function FavouritesProductList() {
 
   useEffect(() => {
     async function getFavourites() {
+      axios.defaults.headers.common["authorization"] =
+        localStorage.getItem("token");
       const response = await axios.get(serverUrl + "/getfavourites", {
         params: { user: Cookies.get("username") },
       });

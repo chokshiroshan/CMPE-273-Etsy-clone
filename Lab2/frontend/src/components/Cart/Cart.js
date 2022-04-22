@@ -16,6 +16,8 @@ export default function Cart() {
 
   useEffect(() => {
     async function getCart() {
+      axios.defaults.headers.common["authorization"] =
+        localStorage.getItem("token");
       const response = await axios.get(serverUrl + "/getcart", {
         params: { user: Cookies.get("username") },
       });
@@ -27,9 +29,11 @@ export default function Cart() {
     }
 
     getCart();
-  }, [item]);
+  }, [item, empty]);
   useEffect(() => {
     async function getTotal() {
+      axios.defaults.headers.common["authorization"] =
+        localStorage.getItem("token");
       const response = await axios.get(serverUrl + "/getcarttotal", {
         params: { user: Cookies.get("username") },
       });
@@ -48,6 +52,8 @@ export default function Cart() {
       items: items,
       user: Cookies.get("username"),
     };
+    axios.defaults.headers.common["authorization"] =
+      localStorage.getItem("token");
     axios.post(serverUrl + "/addpurchased", data).then((response) => {
       if (response.data === "SUCCESS") {
         console.log("Status Code : ", response.status);

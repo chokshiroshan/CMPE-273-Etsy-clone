@@ -16,6 +16,8 @@ export default function ProductList() {
       id: id,
       user: Cookies.get("username"),
     };
+    axios.defaults.headers.common["authorization"] =
+      localStorage.getItem("token");
     axios.post(serverUrl + "/addfavourites", data).then((response) => {
       if (response.data === "SUCCESS") {
         console.log("Status Code : ", response.status);
@@ -29,6 +31,8 @@ export default function ProductList() {
   };
   useEffect(() => {
     async function getItems() {
+      axios.defaults.headers.common["authorization"] =
+        localStorage.getItem("token");
       const response = await axios.get(serverUrl + "/getallitems");
       setItems(response.data);
     }

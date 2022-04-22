@@ -23,6 +23,8 @@ export default function ShopItems(props) {
   };
 
   const deleteItem = (item) => {
+    axios.defaults.headers.common["authorization"] =
+      localStorage.getItem("token");
     axios.delete(serverUrl + "/deleteitem", {
       data: { id: item._id },
     });
@@ -46,6 +48,8 @@ export default function ShopItems(props) {
 
     //set the with credentials to true
     axios.defaults.withCredentials = true;
+    axios.defaults.headers.common["authorization"] =
+      localStorage.getItem("token");
     //make a post request with the user data
     axios.post(serverUrl + "/edititem", bodyFormData).then((response) => {
       if (response.data === "SUCCESS") {
@@ -59,6 +63,8 @@ export default function ShopItems(props) {
   };
   useEffect(() => {
     async function getItems() {
+      axios.defaults.headers.common["authorization"] =
+        localStorage.getItem("token");
       const response = await axios.get(serverUrl + "/getitems", {
         params: { shop: myshop },
       });

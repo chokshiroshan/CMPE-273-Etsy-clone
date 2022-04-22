@@ -5,40 +5,39 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { serverUrl } from "../serverurl";
 
-export default function Item({ item, setItem, history }) {
+export default function Item({ item, setItem, pageSize }) {
   const [items, setItems] = useState([[]]);
   const [empty, setEmpty] = useState(false);
+  const [force, setForce] = useState(false);
+
+  Array.prototype.chunk = function (n) {
+    if (!this.length) {
+      return [];
+    }
+    return [this.slice(0, n)].concat(this.slice(n).chunk(n));
+  };
+  // console.log([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].chunk(5));
 
   useEffect(() => {
-    if (history) {
-      async function getPurchased() {
-        const response = await axios.get(serverUrl + "/getpurchased", {
-          params: { user: Cookies.get("username") },
-        });
-        if (response.data != "EMPTY") {
-          setItems(response.data);
-        } else {
-          setEmpty(true);
-        }
+    async function getCart() {
+      axios.defaults.headers.common["authorization"] =
+        localStorage.getItem("token");
+      const response = await axios.get(serverUrl + "/getcart", {
+        params: { user: Cookies.get("username") },
+      });
+      if (response.data != "EMPTY") {
+        setItems(response.data);
+      } else {
+        setEmpty(true);
       }
-      getPurchased();
-    } else {
-      async function getCart() {
-        const response = await axios.get(serverUrl + "/getcart", {
-          params: { user: Cookies.get("username") },
-        });
-        if (response.data != "EMPTY") {
-          setItems(response.data);
-        } else {
-          setEmpty(true);
-        }
-      }
-
-      getCart();
     }
+
+    getCart();
   }, [item]);
 
   const deleteItem = (item) => {
+    axios.defaults.headers.common["authorization"] =
+      localStorage.getItem("token");
     axios.delete(serverUrl + "/deletecartitem", {
       data: {
         id: item._id,
@@ -47,7 +46,33 @@ export default function Item({ item, setItem, history }) {
       },
     });
     setItem(item);
+    setForce(!force);
   };
+
+  const increment = (item) => {
+    console.log(item);
+    axios.defaults.headers.common["authorization"] =
+      localStorage.getItem("token");
+    axios.put(serverUrl + "/incrementcartitem", {
+      id: item._id,
+      user: Cookies.get("username"),
+    });
+    setItem(item);
+    setForce(!force);
+  };
+
+  const decrement = (item) => {
+    axios.defaults.headers.common["authorization"] =
+      localStorage.getItem("token");
+    axios.put(serverUrl + "/decrementcartitem", {
+      id: item._id,
+      quantity: item.quantity,
+      user: Cookies.get("username"),
+    });
+    setItem(item);
+    setForce(!force);
+  };
+
   return (
     <>
       {empty ? (
@@ -85,17 +110,20 @@ export default function Item({ item, setItem, history }) {
                   <strong>${item.price}</strong>
                 </td>
                 <td className="border-0 align-middle">
+                  <button onClick={() => decrement(item)}>
+                    <i class="fa-solid fa-minus"></i>
+                  </button>
                   <strong>{item.quantity}</strong>
+                  <button onClick={() => increment(item)}>
+                    <i class="fa-solid fa-plus"></i>
+                  </button>
                 </td>
-                {history ? (
-                  ""
-                ) : (
-                  <td className="border-0 align-middle">
-                    <a className="text-dark" onClick={() => deleteItem(item)}>
-                      <i className="fa fa-trash"></i>
-                    </a>
-                  </td>
-                )}
+                <td className="border-0 align-middle">
+                  <a className="text-dark" onClick={() => deleteItem(item)}>
+                    <i className="fa fa-trash"></i>
+                  </a>
+                </td>
+                )
               </tr>
             </tbody>
           ))}

@@ -17,6 +17,8 @@ export default function Home({ userData }) {
   let search = searchParams.get("search");
   useEffect(() => {
     async function getItems() {
+      axios.defaults.headers.common["authorization"] =
+        localStorage.getItem("token");
       const response = await axios.get(serverUrl + "/getsearchitems", {
         params: { keyword: search, filter: filter },
       });
