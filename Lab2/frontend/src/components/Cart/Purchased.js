@@ -31,6 +31,7 @@ export default function Purchased() {
         params: { user: Cookies.get("username") },
       });
       if (response.data != "EMPTY") {
+        console.log(response.data);
         setItems(response.data.chunk(pageSize));
         console.log(items);
       } else {

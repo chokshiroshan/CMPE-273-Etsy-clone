@@ -38,22 +38,37 @@ router.post("/addpurchased", function (request, response) {
   const i = request.body.items;
   console.log(request.body);
   i.map((item) => {
-    purchased.create(
-      {
-        id: item._id,
-        user: request.body.user,
-        quantity: item.quantity,
-      },
-      function (err) {
-        if (err) {
-          console.log(err);
-          response.end("UNSUCCESS");
-        } else {
-          console.log("Item Created");
-          response.end("SUCCESS");
-        }
+    items.findById(item._id, (err, row) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log(row);
+
+        purchased.create(
+          {
+            id: item._id,
+            user: request.body.user,
+            quantity: item.quantity,
+            name: row.name,
+            price: row.price,
+            image: row.image,
+            shop: row.shop,
+            category: row.category,
+            description: row.description,
+          },
+          function (err) {
+            if (err) {
+              console.log(err);
+              response.end("UNSUCCESS");
+            } else {
+              console.log("Item Created");
+              // response.end("SUCCESS");
+            }
+          }
+        );
       }
-    );
+    });
+    response.end("SUCCESS");
   });
   i.map((item) => {
     cart.deleteOne({ id: item._id, user: request.body.user }, function (err) {
@@ -80,34 +95,13 @@ router.post("/addpurchased", function (request, response) {
 });
 
 router.get("/getpurchased", function (request, response) {
-  console.log("in /getpurchased");
-
-  // Capture the input fields
-  purchased.find({ user: request.query.user }, function (err, rows) {
+  purchased.find({ user: request.query.user }, function (err, items) {
     if (err) {
       console.log(err);
-      response.end("EMPTY");
+      response.end("UNSUCCESS");
     } else {
-      let array = [];
-      let q = [];
-      rows.map((row) => {
-        array.push(row.id);
-        q.push(row.quantity);
-      });
-      console.log(q);
-      if (array.length > 0) {
-        items.find({ _id: { $in: array } }, function (err, items) {
-          if (err) {
-            console.log(err);
-          } else {
-            // console.log("items: " + items);
-            items.map((item, index) => (item.quantity = q[index]));
-            // console.log("items after changing: " + items);
-
-            response.json(items);
-          }
-        });
-      }
+      console.log(items);
+      response.json(items);
     }
   });
 });
