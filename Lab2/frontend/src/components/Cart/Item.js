@@ -9,6 +9,8 @@ export default function Item({ item, setItem, pageSize }) {
   const [items, setItems] = useState([[]]);
   const [empty, setEmpty] = useState(false);
   const [force, setForce] = useState(false);
+  const [gift, setGift] = useState(false);
+  const [giftDescription, setGiftDescription] = useState("");
 
   Array.prototype.chunk = function (n) {
     if (!this.length) {
@@ -79,7 +81,7 @@ export default function Item({ item, setItem, pageSize }) {
         ""
       ) : (
         <>
-          {items.map((item) => (
+          {items.map((item, key) => (
             <tbody>
               <tr>
                 <th scope="row" className="border-0">
@@ -109,6 +111,14 @@ export default function Item({ item, setItem, pageSize }) {
                 <td className="border-0 align-middle">
                   <strong>${item.price}</strong>
                 </td>
+                <td>
+                  <input
+                    type="text"
+                    value={giftDescription}
+                    onChange={(e) => setGiftDescription(e.target.value)}
+                  />
+                  <button onClick={() => setGift(!gift)}> Gift</button>
+                </td>
                 <td className="border-0 align-middle">
                   <button onClick={() => decrement(item)}>
                     <i class="fa-solid fa-minus"></i>
@@ -123,7 +133,6 @@ export default function Item({ item, setItem, pageSize }) {
                     <i className="fa fa-trash"></i>
                   </a>
                 </td>
-                )
               </tr>
             </tbody>
           ))}
