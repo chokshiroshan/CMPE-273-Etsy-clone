@@ -9,8 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "^1.0.3",
-    "bcrypt-nodejs": "0.0.3",
     "dotenv": "^16.0.0",
     "formidable": "^1.1.1",
     "glob": "^7.1.2",

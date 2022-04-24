@@ -2,7 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
-const { secret } = require("../utils/config");
+const { secret, backendURL } = require("../utils/config");
 const { auth } = require("../utils/passport");
 const { checkAuth } = require("../utils/passport");
 const users = require("../models/Users");
@@ -105,7 +105,7 @@ router.post("/userupdate", upload.single("file"), function (request, response) {
     console.log("File Renamed.");
   });
   // console.log(file);
-  image = "http://localhost:3001/images/users/" + username + ".jpeg";
+  image = backendURL + "/images/users/" + username + ".jpeg";
   kafka.make_request("userupdate", request.body, function (err, results) {
     console.log("in result");
     console.log(results);

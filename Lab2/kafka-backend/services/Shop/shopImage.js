@@ -1,11 +1,12 @@
 const users = require("../../models/Users");
+const { backendURL } = require("../../utils/config");
 
 function handle_request(msg, callback) {
   console.log("Inside Kafka Backend Login");
   console.log("Message: ", msg);
   const shop = msg.shop;
 
-  const image = "http://localhost:3001/images/shops/" + shop + ".jpeg";
+  const image = backendURL + "/images/shops/" + shop + ".jpeg";
 
   if (shop) {
     users.updateOne(

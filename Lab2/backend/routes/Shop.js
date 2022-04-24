@@ -9,6 +9,7 @@ const fs = require("fs");
 const users = require("../models/Users");
 const items = require("../models/Items");
 const kafka = require("../kafka/client");
+const { backendURL } = require("../utils/config");
 
 const multer = require("multer");
 const fileStorageEngine = multer.diskStorage({
@@ -63,7 +64,7 @@ router.post("/shopimage", upload.single("file"), function (request, response) {
     console.log("File Renamed.");
   });
   // console.log(file);
-  image = "http://localhost:3001/images/shops/" + request.body.shop + ".jpeg";
+  image = backendURL + "/images/shops/" + request.body.shop + ".jpeg";
   // Execute SQL query that'll select the account from the database based on the specified username and password
   kafka.make_request("shopimage", request.body, function (err, results) {
     console.log("in result");
@@ -93,7 +94,7 @@ router.post("/additem", upload.single("file"), function (request, response) {
     console.log("File Renamed.");
   });
   // console.log(file);
-  image = "http://localhost:3001/images/items/" + request.body.name + ".jpeg";
+  image = backendURL + "/images/items/" + request.body.name + ".jpeg";
   // Execute SQL query that'll select the account from the database based on the specified username and password
   kafka.make_request("additem", request.body, function (err, results) {
     console.log("in result");
@@ -112,7 +113,7 @@ router.post("/additem", upload.single("file"), function (request, response) {
 router.post("/edititem", upload.single("file"), function (request, response) {
   // Capture the input fields
   console.log("body: ", request.body);
-  image = "http://localhost:3001/images/items/" + request.body.name + ".jpeg";
+  image = backendURL + "/images/items/" + request.body.name + ".jpeg";
   fs.rename("public/images/items/file.jpeg", image, function (err) {
     if (err) {
       console.log(err);
