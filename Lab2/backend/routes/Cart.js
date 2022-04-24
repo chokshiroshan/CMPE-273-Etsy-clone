@@ -9,6 +9,7 @@ const users = require("../models/Users");
 const items = require("../models/Items");
 const favourites = require("../models/Favourites");
 const cart = require("../models/Cart");
+const kafka = require("../kafka/client");
 
 const multer = require("multer");
 const fileStorageEngine = multer.diskStorage({
@@ -36,37 +37,20 @@ auth();
 router.post("/addcart", function (request, response) {
   // Capture the input fields
   console.log(request.body);
+  kafka.make_request("addcart", request.body, function (err, results) {
+    console.log("in result");
 
-  cart.create(
-    {
-      id: request.body.id,
-      user: request.body.user,
-      quantity: request.body.quantity,
-    },
-    function (err) {
-      if (err) {
-        console.log(err);
-        response.end("UNSUCCESS");
-      } else {
-        items.updateOne(
-          { _id: request.body.id },
-          { $set: { quantity: request.body.rquantity } },
-          function (err) {
-            if (err) {
-              console.log(err);
-            } else {
-              console.log("Item Updated");
-            }
-          }
-        );
-        response.writeHead(200, {
-          "Content-Type": "text/plain",
-        });
-        console.log("Item Created");
-        response.end("SUCCESS");
-      }
+    if (err) {
+      console.log("Inside err");
+      response.json({
+        status: "error",
+        msg: "System Error, Try Again.",
+      });
+    } else {
+      console.log("Inside else");
+      response.end(results);
     }
-  );
+  });
 });
 
 router.get("/getcart", function (request, response) {
@@ -122,58 +106,38 @@ router.delete("/deletecartitem", function (req, res) {
 router.get("/getcarttotal", function (request, response) {
   // Capture the input fields
   // console.log(request.query);
+  kafka.make_request("getcarttotal", request.query, function (err, results) {
+    console.log("in result");
 
-  cart.find({ user: request.query.user }, function (err, rows) {
     if (err) {
-      console.log(err);
-      response.end("EMPTY");
+      console.log("Inside err");
+      response.json({
+        status: "error",
+        msg: "System Error, Try Again.",
+      });
     } else {
-      let array = [];
-      let quantity = [];
-      rows.map((row) => array.push(row.id));
-      rows.map((row) => quantity.push(row.quantity));
-      if (array.length > 0) {
-        items.find({ _id: { $in: array } }, function (err, items) {
-          if (err) {
-            console.log(err);
-          } else {
-            let q = 0;
-            items.map((item, index) => (q = item.price * quantity[index] + q));
-            // console.log("items: " + items);
-            response.json(q);
-          }
-        });
-      }
+      console.log("Inside else");
+      response.json(results);
     }
   });
 });
 
 router.put("/incrementcartitem", function (req, res) {
   console.log(req.body);
-  cart.updateOne(
-    { id: req.body.id, user: req.body.user },
-    { $inc: { quantity: 1 } },
-    function (err) {
-      if (err) {
-        console.log(err);
-      } else {
-        items.updateOne(
-          { _id: req.body.id },
-          { $inc: { quantity: -1 } },
-          function (err) {
-            if (err) {
-              console.log(err);
-            } else {
-              console.log("Item Quantity Incremented");
-            }
-          }
-        );
-        res.writeHead(200, { "Content-Type": "text/plain" });
-        console.log("Item Quantity Incremented");
-        res.end("SUCCESS");
-      }
+  kafka.make_request("incrementcartitem", req.body, function (err, results) {
+    console.log("in result");
+
+    if (err) {
+      console.log("Inside err");
+      res.json({
+        status: "error",
+        msg: "System Error, Try Again.",
+      });
+    } else {
+      console.log("Inside else");
+      res.end(results);
     }
-  );
+  });
 });
 
 router.put("/decrementcartitem", function (req, res) {

@@ -10,6 +10,7 @@ const items = require("../models/Items");
 const favourites = require("../models/Favourites");
 const cart = require("../models/Cart");
 const purchased = require("../models/Purchased");
+const kafka = require("../kafka/client");
 
 const multer = require("multer");
 const fileStorageEngine = multer.diskStorage({
@@ -35,75 +36,19 @@ const upload = multer({ storage: fileStorageEngine });
 auth();
 
 router.post("/addpurchased", function (request, response) {
-  const i = request.body.items;
+  kafka.make_request("addpurchased", request.body, function (err, results) {
+    console.log("in result");
 
-  i.map((item) => {
-    // console.log("purchsed item: ", item);
-    items.findById(item._id, (err, row) => {
-      if (err) {
-        console.log(err);
-      } else {
-        // console.log(row);
-        cart.find({ user: request.body.user, id: item._id }, (err, r) => {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log("cart item: ", r[0].gift);
-            purchased.create(
-              {
-                id: item._id,
-                user: request.body.user,
-                quantity: item.quantity,
-                name: row.name,
-                price: row.price,
-                image: row.image,
-                shop: row.shop,
-                category: row.category,
-                description: row.description,
-                gift: r[0].gift,
-                giftDescription: r[0].giftDescription,
-              },
-              function (err) {
-                if (err) {
-                  console.log(err);
-                  response.end("UNSUCCESS");
-                } else {
-                  console.log("Item Created");
-                  // response.end("SUCCESS");
-                  i.map((item) => {
-                    cart.deleteOne(
-                      { id: item._id, user: request.body.user },
-                      function (err) {
-                        if (err) {
-                          console.log(err);
-                        } else {
-                          console.log("Item Deleted");
-                        }
-                      }
-                    );
-                  });
-                }
-              }
-            );
-          }
-        });
-      }
-    });
-    response.end("SUCCESS");
-  });
-
-  i.map((item) => {
-    items.updateOne(
-      { _id: item._id },
-      { $inc: { sold: item.quantity } },
-      function (err) {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log("Item Updated");
-        }
-      }
-    );
+    if (err) {
+      console.log("Inside err");
+      response.json({
+        status: "error",
+        msg: "System Error, Try Again.",
+      });
+    } else {
+      console.log("Inside else");
+      response.end(results);
+    }
   });
 });
 

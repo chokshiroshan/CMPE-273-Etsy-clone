@@ -8,6 +8,7 @@ const { checkAuth } = require("../utils/passport");
 const users = require("../models/Users");
 const items = require("../models/Items");
 const favourites = require("../models/Favourites");
+const kafka = require("../kafka/client");
 
 const multer = require("multer");
 const fileStorageEngine = multer.diskStorage({
@@ -33,24 +34,36 @@ const upload = multer({ storage: fileStorageEngine });
 auth();
 
 router.post("/addfavourites", function (request, response) {
-  // Capture the input fields
-  console.log(request.body);
-  favourites.create(
-    { id: request.body.id, user: request.body.user },
-    function (err, item) {
-      if (err) {
-        console.log(err);
-        response.end("UNSUCCESS");
-      } else {
-        response.writeHead(200, {
-          "Content-Type": "text/plain",
-        });
-        console.log("Item Created");
-        response.end("SUCCESS");
-      }
+  kafka.make_request("addfavourites", request.body, function (err, results) {
+    console.log("in result");
+
+    if (err) {
+      console.log("Inside err");
+      response.status(500).send({ message: "Internal server error" });
+    } else {
+      response.status(200).send(results);
     }
-  );
+  });
 });
+
+// Capture the input fields
+//   console.log(request.body);
+//   favourites.create(
+//     { id: request.body.id, user: request.body.user },
+//     function (err, item) {
+//       if (err) {
+//         console.log(err);
+//         response.end("UNSUCCESS");
+//       } else {
+//         response.writeHead(200, {
+//           "Content-Type": "text/plain",
+//         });
+//         console.log("Item Created");
+//         response.end("SUCCESS");
+//       }
+//     }
+//   );
+// });
 
 router.delete("/removefavourite", function (req, res) {
   console.log(req.body);

@@ -8,6 +8,7 @@ const { checkAuth } = require("../utils/passport");
 const fs = require("fs");
 const users = require("../models/Users");
 const items = require("../models/Items");
+const kafka = require("../kafka/client");
 
 const multer = require("multer");
 const fileStorageEngine = multer.diskStorage({
@@ -34,36 +35,20 @@ let image;
 auth();
 
 router.post("/checkshop", function (request, response) {
-  let shop = request.body.shop;
-  let username = request.body.username;
-
-  console.log(request.body);
-  // Ensure the input fields exists and are not empty
-  if (shop) {
-    // Execute SQL query that'll select the account from the database based on the specified username and password
-
-    users.updateOne(
-      { username: username },
-      { $set: { shop: shop } },
-      function (err) {
-        if (err) {
-          console.log("Shop not Created");
-
-          response.end("UNSUCCESS");
-        } else {
-          response.writeHead(200, {
-            "Content-Type": "text/plain",
-          });
-          // Redirect to home page
-          console.log("Shop Created");
-          response.end("SUCCESS");
-        }
-      }
-    );
-  } else {
-    response.send("Please enter Shop name!");
-    response.end();
-  }
+  kafka.make_request("checkshop", request.body, function (err, results) {
+    console.log("in result");
+    console.log(results);
+    if (err) {
+      console.log("Inside err");
+      response.json({
+        status: "error",
+        msg: "System Error, Try Again.",
+      });
+    } else {
+      console.log("Inside else");
+      response.end(results);
+    }
+  });
 });
 
 router.post("/shopimage", upload.single("file"), function (request, response) {
@@ -80,27 +65,20 @@ router.post("/shopimage", upload.single("file"), function (request, response) {
   // console.log(file);
   image = "http://localhost:3001/images/shops/" + request.body.shop + ".jpeg";
   // Execute SQL query that'll select the account from the database based on the specified username and password
-  if (request.body.shop) {
-    users.updateOne(
-      { shop: request.body.shop },
-      { $set: { shopimage: image } },
-      function (err) {
-        if (err) {
-          console.log("Shop Image not Updated");
-          response.end("UNSUCCESS");
-        } else {
-          response.writeHead(200, {
-            "Content-Type": "text/plain",
-          });
-          console.log("Shop Image Updated");
-          response.end("SUCCESS");
-        }
-      }
-    );
-  } else {
-    response.send("Please enter Shop name!");
-    response.end();
-  }
+  kafka.make_request("shopimage", request.body, function (err, results) {
+    console.log("in result");
+    console.log(results);
+    if (err) {
+      console.log("Inside err");
+      response.json({
+        status: "error",
+        msg: "System Error, Try Again.",
+      });
+    } else {
+      console.log("Inside else");
+      response.end(results);
+    }
+  });
 });
 
 router.post("/additem", upload.single("file"), function (request, response) {
@@ -117,34 +95,18 @@ router.post("/additem", upload.single("file"), function (request, response) {
   // console.log(file);
   image = "http://localhost:3001/images/items/" + request.body.name + ".jpeg";
   // Execute SQL query that'll select the account from the database based on the specified username and password
-  if (request.body.name) {
-    items.create(
-      {
-        image: image,
-        name: request.body.name,
-        category: request.body.category,
-        price: request.body.price,
-        description: request.body.description,
-        quantity: request.body.quantity,
-        shop: request.body.shop,
-      },
-      function (err, item) {
-        if (err) {
-          console.log(err);
-          response.end("UNSUCCESS");
-        } else {
-          response.writeHead(200, {
-            "Content-Type": "text/plain",
-          });
-          console.log("Item Created");
-          response.end("SUCCESS");
-        }
-      }
-    );
-  } else {
-    response.send("Please enter Item name!");
-    response.end();
-  }
+  kafka.make_request("additem", request.body, function (err, results) {
+    console.log("in result");
+    console.log(results);
+    if (err) {
+      response.json({
+        status: "error",
+        msg: "System Error, Try Again.",
+      });
+    } else {
+      response.end(results);
+    }
+  });
 });
 
 router.post("/edititem", upload.single("file"), function (request, response) {
@@ -157,33 +119,18 @@ router.post("/edititem", upload.single("file"), function (request, response) {
     }
     console.log("File Renamed.");
   });
-
-  items.updateOne(
-    { $and: [{ _id: request.body.id }, { shop: request.body.shop }] },
-    {
-      $set: {
-        image: image,
-        name: request.body.name,
-        category: request.body.category,
-        price: request.body.price,
-        description: request.body.description,
-        quantity: request.body.quantity,
-        shop: request.body.shop,
-      },
-    },
-    function (err) {
-      if (err) {
-        console.log("Item Image not Updated");
-        response.end("UNSUCCESS");
-      } else {
-        response.writeHead(200, {
-          "Content-Type": "text/plain",
-        });
-        console.log("Item Image Updated");
-        response.end("SUCCESS");
-      }
+  kafka.make_request("edititem", request.body, function (err, results) {
+    console.log("in result");
+    console.log(results);
+    if (err) {
+      response.json({
+        status: "error",
+        msg: "System Error, Try Again.",
+      });
+    } else {
+      response.end(results);
     }
-  );
+  });
 });
 
 router.delete("/deleteitem", function (req, res) {
@@ -199,25 +146,35 @@ router.delete("/deleteitem", function (req, res) {
 });
 
 router.get("/getitems", function (request, response) {
-  let shop = request.query.shop;
-
-  items.find({ shop: shop }, function (err, items) {
+  kafka.make_request("getitems", request.query, function (err, results) {
+    console.log("in result");
+    console.log(results);
     if (err) {
-      console.log(err);
+      console.log("Inside err");
+      response.json({
+        status: "error",
+        msg: "System Error, Try Again.",
+      });
     } else {
-      response.json(items);
+      console.log("Inside else");
+      response.json(results);
     }
   });
 });
 
 router.get("/getshopowner", function (request, response) {
-  let shop = request.query.shop;
-
-  users.find({ shop: shop }, function (err, users) {
+  kafka.make_request("getshopowner", request.query, function (err, results) {
+    console.log("in result");
+    console.log(results);
     if (err) {
-      console.log(err);
+      console.log("Inside err");
+      response.json({
+        status: "error",
+        msg: "System Error, Try Again.",
+      });
     } else {
-      response.json(users);
+      console.log("Inside else");
+      response.json(results);
     }
   });
 });

@@ -8,6 +8,7 @@ const { checkAuth } = require("../utils/passport");
 const users = require("../models/Users");
 const items = require("../models/Items");
 const favourites = require("../models/Favourites");
+const kafka = require("../kafka/client");
 
 const multer = require("multer");
 const fileStorageEngine = multer.diskStorage({
@@ -33,84 +34,38 @@ const upload = multer({ storage: fileStorageEngine });
 auth();
 
 router.get("/getallitems", function (request, response) {
-  items.find({}, function (err, items) {
+  kafka.make_request("getallitems", request.body, function (err, results) {
+    console.log("in result");
+    console.log(results);
     if (err) {
-      console.log(err);
+      console.log("Inside err");
+      response.json({
+        status: "error",
+        msg: "System Error, Try Again.",
+      });
     } else {
-      response.json(items);
+      console.log("Inside else");
+      response.json(results);
     }
   });
 });
 
 router.get("/getsearchitems", function (request, response) {
   console.log("request: ", request.query);
-  const filter = request.query.filter;
-  // const query = ;
-  // console.log(query);
-  if (filter) {
-    if (filter == 1) {
-      items.find(
-        {
-          $and: [
-            { name: { $regex: request.query.keyword } },
-            { price: { $lt: 50 } },
-          ],
-        },
-        function (err, items) {
-          if (err) {
-            console.log(err);
-          } else {
-            response.json(items);
-          }
-        }
-      );
-    } else if (filter == 2) {
-      items.find(
-        {
-          $and: [
-            { name: { $regex: request.query.keyword } },
-            { $and: [{ price: { $gt: 50 } }, { price: { $lt: 100 } }] },
-          ],
-        },
-        function (err, items) {
-          if (err) {
-            console.log(err);
-          } else {
-            response.json(items);
-          }
-        }
-      );
+  kafka.make_request("getsearchitems", request.query, function (err, results) {
+    console.log("in result");
+    console.log(results);
+    if (err) {
+      console.log("Inside err");
+      response.json({
+        status: "error",
+        msg: "System Error, Try Again.",
+      });
     } else {
-      items.find(
-        {
-          $and: [
-            { name: { $regex: request.query.keyword } },
-            { price: { $gt: 100 } },
-          ],
-        },
-        function (err, items) {
-          if (err) {
-            console.log(err);
-          } else {
-            response.json(items);
-          }
-        }
-      );
+      console.log("Inside else");
+      response.json(results);
     }
-  } else {
-    items.find(
-      { name: { $regex: request.query.keyword } },
-      function (err, items) {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log("no filter");
-          console.log(items);
-          response.json(items);
-        }
-      }
-    );
-  }
+  });
 });
 
 module.exports = router;

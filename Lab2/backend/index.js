@@ -12,6 +12,7 @@ const items = require("./models/Items");
 const favourites = require("./models/Favourites");
 const cart = require("./models/Cart");
 const purchased = require("./models/Purchased");
+var kafka = require("./kafka/client");
 
 require("dotenv").config();
 
@@ -71,11 +72,11 @@ const Cart = require("./routes/Cart");
 const Purchased = require("./routes/Purchased");
 
 app.use("/", Auth);
-app.use("/", checkAuth, User);
-app.use("/", checkAuth, Shop);
-app.use("/", checkAuth, Favourites);
-app.use("/", checkAuth, Items);
-app.use("/", checkAuth, Cart);
-app.use("/", checkAuth, Purchased);
+app.use("/", User);
+app.use("/", Shop);
+app.use("/", Favourites);
+app.use("/", Items);
+app.use("/", Cart);
+app.use("/", Purchased);
 
 app.listen("3001", () => {});
