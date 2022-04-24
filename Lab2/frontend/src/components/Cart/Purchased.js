@@ -117,6 +117,9 @@ export default function Purchased() {
                     <th scope="col" className="border-0 bg-light">
                       <div className="py-2 text-uppercase">Quantity</div>
                     </th>
+                    <th scope="col" className="border-0 bg-light">
+                      <div className="py-2 text-uppercase">Gift</div>
+                    </th>
                   </tr>
                 </thead>
                 <PurchasedItem

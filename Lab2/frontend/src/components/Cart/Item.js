@@ -5,12 +5,12 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { serverUrl } from "../serverurl";
 
-export default function Item({ item, setItem, pageSize }) {
-  const [items, setItems] = useState([[]]);
+export default function Item({ items, setItems, item, setItem, pageSize }) {
+  // const [items, setItems] = useState([[]]);
   const [empty, setEmpty] = useState(false);
   const [force, setForce] = useState(false);
-  const [gift, setGift] = useState(false);
-  const [giftDescription, setGiftDescription] = useState("");
+  const [gift, setGift] = useState({});
+  const [giftDescription, setGiftDescription] = useState({});
 
   Array.prototype.chunk = function (n) {
     if (!this.length) {
@@ -20,22 +20,22 @@ export default function Item({ item, setItem, pageSize }) {
   };
   // console.log([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].chunk(5));
 
-  useEffect(() => {
-    async function getCart() {
-      axios.defaults.headers.common["authorization"] =
-        localStorage.getItem("token");
-      const response = await axios.get(serverUrl + "/getcart", {
-        params: { user: Cookies.get("username") },
-      });
-      if (response.data != "EMPTY") {
-        setItems(response.data);
-      } else {
-        setEmpty(true);
-      }
-    }
+  // useEffect(() => {
+  //   async function getCart() {
+  //     axios.defaults.headers.common["authorization"] =
+  //       localStorage.getItem("token");
+  //     const response = await axios.get(serverUrl + "/getcart", {
+  //       params: { user: Cookies.get("username") },
+  //     });
+  //     if (response.data != "EMPTY") {
+  //       setItems(response.data);
+  //     } else {
+  //       setEmpty(true);
+  //     }
+  //   }
 
-    getCart();
-  }, [item]);
+  //   getCart();
+  // }, [item]);
 
   const deleteItem = (item) => {
     axios.defaults.headers.common["authorization"] =
@@ -72,6 +72,28 @@ export default function Item({ item, setItem, pageSize }) {
       user: Cookies.get("username"),
     });
     setItem(item);
+    setForce(!force);
+  };
+
+  const addGift = (value, key) => {
+    setGift({ ...gift, [key]: value });
+  };
+
+  const addGiftDescription = (value, key) => {
+    setGiftDescription({ ...gift, [key]: value });
+  };
+
+  const addGiftToCart = (key, item) => {
+    axios.defaults.headers.common["authorization"] =
+      localStorage.getItem("token");
+    axios.put(serverUrl + "/addgift", {
+      id: item._id,
+      user: Cookies.get("username"),
+      gift: gift[key],
+      giftDescription: giftDescription[key],
+    });
+    setGift({ ...gift, [key]: "" });
+    setGiftDescription({ ...giftDescription, [key]: "" });
     setForce(!force);
   };
 
@@ -113,19 +135,28 @@ export default function Item({ item, setItem, pageSize }) {
                 </td>
                 <td>
                   <input
-                    type="text"
-                    value={giftDescription}
-                    onChange={(e) => setGiftDescription(e.target.value)}
+                    type="checkbox"
+                    checked={item.gift}
+                    onChange={(e) => {
+                      addGift(e.target.checked, key);
+                    }}
                   />
-                  <button onClick={() => setGift(!gift)}> Gift</button>
+                  <input
+                    type="text"
+                    value={item.giftDescription}
+                    onChange={(e) => addGiftDescription(e.target.value, key)}
+                  />
+                  <button onClick={() => addGiftToCart(key, item)}>
+                    Add Gift
+                  </button>
                 </td>
                 <td className="border-0 align-middle">
                   <button onClick={() => decrement(item)}>
-                    <i class="fa-solid fa-minus"></i>
+                    <i className="fa-solid fa-minus"></i>
                   </button>
                   <strong>{item.quantity}</strong>
                   <button onClick={() => increment(item)}>
-                    <i class="fa-solid fa-plus"></i>
+                    <i className="fa-solid fa-plus"></i>
                   </button>
                 </td>
                 <td className="border-0 align-middle">

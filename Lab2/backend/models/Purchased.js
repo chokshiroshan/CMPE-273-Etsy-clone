@@ -12,6 +12,8 @@ const purchased = mongoose.Schema(
     shop: { type: String, default: null },
     quantity: { type: Number, default: null },
     sold: { type: Number, default: 0 },
+    gift: { type: Boolean, default: false },
+    giftDescription: { type: String, default: null },
   },
   { collection: "purchased" }
 );

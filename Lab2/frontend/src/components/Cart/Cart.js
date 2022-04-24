@@ -95,7 +95,12 @@ export default function Cart() {
                         </th>
                       </tr>
                     </thead>
-                    <Item item={item} setItem={setItem} />
+                    <Item
+                      items={items}
+                      setItems={setItems}
+                      item={item}
+                      setItem={setItem}
+                    />
                   </table>
                 </div>
               </>

@@ -228,4 +228,23 @@ router.put("/decrementcartitem", function (req, res) {
   );
 });
 
+router.put("/addgift", function (req, res) {
+  console.log(req.body);
+  cart.updateOne(
+    { id: req.body.id, user: req.body.user },
+    {
+      $set: { gift: req.body.gift, giftDescription: req.body.giftDescription },
+    },
+    function (err) {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Gift Added");
+        res.writeHead(200, { "Content-Type": "text/plain" });
+        res.end("SUCCESS");
+      }
+    }
+  );
+});
+
 module.exports = router;

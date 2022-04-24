@@ -48,6 +48,13 @@ export default function PurchasedItem({
                 <td className="border-0 align-middle">
                   <strong>{item.quantity}</strong>
                 </td>
+                <td className="border-0 align-middle">
+                  <strong>{item.gift ? "Yes" : "No"}</strong>
+                  <br />
+                  <strong>
+                    {item.giftDescription ? item.giftDescription : ""}
+                  </strong>
+                </td>
               </tr>
             </tbody>
           ))}
