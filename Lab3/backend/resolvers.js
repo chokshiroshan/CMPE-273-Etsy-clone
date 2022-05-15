@@ -12,42 +12,18 @@ const resolvers = {
     getPurchasedItem: (_, { _id }) => purchased.findById(_id),
   },
   Mutation: {
-    addUser: (
-      _,
-      {
-        username,
-        password,
-        email,
-        firstName,
-        lastName,
-        address,
-        city,
-        state,
-        zip,
-        phone,
-        image,
-        role,
-      }
-    ) => {
+    addUser: (_, { username, password, email }) => {
       const newUser = new users({
         username,
         password,
         email,
-        firstName,
-        lastName,
-        address,
-        city,
-        state,
-        zip,
-        phone,
-        image,
-        role,
       });
       newUser.save();
       return newUser;
     },
     addItem: (_, { name, description, price, image, category, quantity }) => {
       const newItem = new items({
+        _id,
         name,
         description,
         price,

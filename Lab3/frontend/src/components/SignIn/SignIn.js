@@ -7,6 +7,9 @@ import { Navigate } from "react-router";
 import { serverUrl } from "../serverurl";
 import jwt_decode from "jwt-decode";
 
+import { Query, Mutation } from "react-apollo";
+import { gql } from "apollo-boost";
+
 export default function SignIn() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
